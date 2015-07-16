@@ -263,6 +263,8 @@ impl<'a, R: HttpRequest + 'a> MultipartField<'a, R> {
     fn read_from(multipart: &'a mut Multipart<R>) -> io::Result<Option<MultipartField<'a, R>>> {
         try!(multipart.source.consume_boundary());
 
+        let _ = try!(multipart.read_line()); // Consume empty line
+
         let cont_disp = match multipart.read_content_disposition() {
             Ok(Some(cont_disp)) => cont_disp,
             Ok(None) => return Ok(None),
