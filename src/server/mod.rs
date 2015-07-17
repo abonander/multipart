@@ -57,7 +57,8 @@ impl<R> Multipart<R> where R: HttpRequest {
             return Err(req);     
         }
 
-        let boundary = req.boundary().unwrap().to_owned();
+        // multipart prefixes the boundary announced in the Content-Type header with a double dash "--"
+        let boundary = format!("--{}", req.boundary().unwrap().to_owned());
 
         debug!("Boundary: {}", boundary);
 
