@@ -1,5 +1,5 @@
 //! Server-side integration with [Hyper](https://github.com/hyperium/hyper).
-//! Enabled with the `hyper` feature.
+//! Enabled with the `hyper` feature (on by default).
 use hyper::net::Fresh;
 use hyper::header::ContentType;
 use hyper::method::Method;
@@ -83,7 +83,7 @@ impl<'a, 'b> HttpRequest for Request<'a, 'b> {
 
             params.iter().find(|&&(ref name, _)|
                 match *name {
-                    Attr::Ext(ref name) => "boundary" == name,
+                    Attr::Boundary => true,
                     _ => false,
                 }
             ).and_then(|&(_, ref val)|
