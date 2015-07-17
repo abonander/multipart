@@ -70,6 +70,14 @@ impl<R> Multipart<R> where R: HttpRequest {
         )
     }
 
+    // the boundary reader is not multipart aware, so we have to consume
+    // the CRLF after the boundary
+    fn consume_boundary(&mut self) -> io::Result<()> {
+        self.source.consume_boundary().and_then(
+            |_| self.read_line().and(Ok(())) // either reads CRLF or --CRLF
+        ) 
+    }
+
     /// Read the next entry from this multipart request, returning a struct with the field's name and
     /// data. See `MultipartField` for more info.
     ///
@@ -262,7 +270,7 @@ pub struct MultipartField<'a, R: 'a> {
 
 impl<'a, R: HttpRequest + 'a> MultipartField<'a, R> {
     fn read_from(multipart: &'a mut Multipart<R>) -> io::Result<Option<MultipartField<'a, R>>> {
-        try!(multipart.source.consume_boundary());
+        try!(multipart.consume_boundary());
 
         let cont_disp = match multipart.read_content_disposition() {
             Ok(Some(cont_disp)) => cont_disp,
