@@ -36,6 +36,9 @@ impl<R: Read> CustomBufReader<R> {
             self.cap = try!(self.inner.read(&mut self.buf));
             self.pos = 0;
         } else if min > self.cap - self.pos {
+            for i in 0..min{
+                self.buf.push(0);
+            }
             self.cap += try!(self.inner.read(&mut self.buf[self.cap..]));
         }            
 
