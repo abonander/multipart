@@ -53,3 +53,6 @@ default = ["hyper", "server", "client"]
 server = ["buf_redux", "memchr"]
 #Disabled until Nickel upgrades to Hyper 0.7
 #nickel2 = ["hyper", "nickel"]
+hyper_sync = []
+hyper_async = ["hyper"]
+

@@ -36,7 +36,10 @@ macro_rules! try_opt (
 mod boundary;
 
 #[cfg(feature = "hyper")]
-pub mod hyper;
+pub mod hyper_async;
+
+#[cfg(feature = "hyper_sync")]
+pub mod hyper_sync;
 
 #[cfg(feature = "iron")]
 pub mod iron;
