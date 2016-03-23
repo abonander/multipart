@@ -10,20 +10,15 @@ extern crate memchr;
 use self::buf_redux::BufReader;
 use self::memchr::memchr;
 
-use std::cmp;
 use std::borrow::Borrow;
-
-use std::io;
 use std::io::prelude::*;
+use std::{cmp, io, mem};
 
 /// A struct implementing `Read` and `BufRead` that will yield bytes until it sees a given sequence.
 #[derive(Debug)]
 pub struct BoundaryReader<R> {
     buf: BufReader<R>,
-    boundary: Vec<u8>,
-    search_idx: usize,
-    boundary_read: bool,
-    at_end: bool,
+    searcher: Searcher,
 }
 
 impl<R> BoundaryReader<R> where R: Read {
@@ -31,71 +26,20 @@ impl<R> BoundaryReader<R> where R: Read {
     pub fn from_reader<B: Into<Vec<u8>>>(reader: R, boundary: B) -> BoundaryReader<R> {
         BoundaryReader {
             buf: BufReader::new(reader),
-            boundary: boundary.into(),
-            search_idx: 0,
-            boundary_read: false,
-            at_end: false,
+            searcher: Searcher::new(boundary),
         }
     }
 
     fn read_to_boundary(&mut self) -> io::Result<&[u8]> {
         use log::LogLevel;
 
-        let buf = try!(fill_buf_min(&mut self.buf, self.boundary.len()));
+        let buf = try!(fill_buf_min(&mut self.buf, self.searcher.boundary.len()));
         
         if log_enabled!(LogLevel::Trace) {
             trace!("Buf: {:?}", String::from_utf8_lossy(buf));
         }
 
-        debug!(
-            "Before-loop Buf len: {} Search idx: {} Boundary read: {:?}", 
-            buf.len(), self.search_idx, self.boundary_read
-        );
-
-        while !(self.boundary_read || self.at_end) && self.search_idx < buf.len() {
-            let lookahead = &buf[self.search_idx..];
-
-            let maybe_boundary = memchr(self.boundary[0], lookahead);
-
-            debug!("maybe_boundary: {:?}", maybe_boundary);
-
-            self.search_idx = match maybe_boundary {
-                Some(boundary_start) => self.search_idx + boundary_start,
-                None => buf.len(),
-            };
-
-            if self.search_idx + self.boundary.len() <= buf.len() {
-                let test = &buf[self.search_idx .. self.search_idx + self.boundary.len()];
-
-                match first_nonmatching_idx(test, &self.boundary) {
-                    Some(idx) => self.search_idx += idx,
-                    None => self.boundary_read = true,
-                } 
-            } else {
-                break;
-            }            
-        }        
-        
-        debug!(
-            "After-loop Buf len: {} Search idx: {} Boundary read: {:?}", 
-            buf.len(), self.search_idx, self.boundary_read
-        );
-
-
-        let mut buf_end = self.search_idx;
-        
-        if self.boundary_read && self.search_idx >= 2 {
-            let two_bytes_before = &buf[self.search_idx - 2 .. self.search_idx];
-
-            debug!("Two bytes before: {:?} (\"\\r\\n\": {:?})", two_bytes_before, b"\r\n");
-
-            if two_bytes_before == &*b"\r\n" {
-                debug!("Subtract two!");
-                buf_end -= 2;
-            } 
-        }
-
-        let ret_buf = &buf[..buf_end];
+        let ret_buf = self.searcher.search(buf);
 
         if log_enabled!(LogLevel::Trace) {
             trace!("Returning buf: {:?}", String::from_utf8_lossy(ret_buf));
@@ -106,11 +50,7 @@ impl<R> BoundaryReader<R> where R: Read {
 
     #[doc(hidden)]
     pub fn consume_boundary(&mut self) -> io::Result<()> {
-        if self.at_end {
-            return Ok(());
-        }
-
-        while !self.boundary_read {
+        while !self.searcher.boundary_read {
             let buf_len = try!(self.read_to_boundary()).len();
 
             if buf_len == 0 {
@@ -120,11 +60,9 @@ impl<R> BoundaryReader<R> where R: Read {
             self.consume(buf_len);
         }
 
-        self.buf.consume(self.search_idx + self.boundary.len());
+        self.buf.consume(self.searcher.search_idx + self.searcher.boundary.len());
 
-        self.search_idx = 0;
-        self.boundary_read = false;
- 
+        self.searcher.reset(); 
         Ok(())
     }
 
@@ -132,7 +70,7 @@ impl<R> BoundaryReader<R> where R: Read {
     #[allow(unused)]
     #[doc(hidden)]
     pub fn set_boundary<B: Into<Vec<u8>>>(&mut self, boundary: B) {
-        self.boundary = boundary.into();
+        self.searcher.set_boundary(boundary);
     }
 }
 
@@ -161,12 +99,12 @@ impl<R> BufRead for BoundaryReader<R> where R: Read {
     }
 
     fn consume(&mut self, amt: usize) {
-        let true_amt = cmp::min(amt, self.search_idx);
+        let true_amt = cmp::min(amt, self.searcher.search_idx);
 
         debug!("Consume! amt: {} true amt: {}", amt, true_amt);
 
         self.buf.consume(true_amt);
-        self.search_idx -= true_amt;
+        self.searcher.consume(true_amt);
     }
 }
 
@@ -177,6 +115,101 @@ fn fill_buf_min<R: Read>(buf: &mut BufReader<R>, min: usize) -> io::Result<&[u8]
 
     Ok(buf.get_buf())
 }
+
+#[derive(Debug)]
+pub struct Searcher {
+    boundary: Vec<u8>,
+    search_idx: usize,
+    boundary_read: bool,
+}
+
+impl Searcher {
+    pub fn new<B: Into<Vec<u8>>>(boundary: B) -> Self {
+        Searcher {
+            boundary: boundary.into(),
+            search_idx: 0,
+            boundary_read: false,
+        }
+    }
+
+    pub fn search<'a>(&mut self, buf: &'a [u8]) -> &'a [u8] {
+        debug!(
+            "Before-loop Buf len: {} Search idx: {} Boundary read: {:?}", 
+            buf.len(), self.search_idx, self.boundary_read
+        );
+
+        while !self.boundary_read && self.search_idx < buf.len() {
+            let lookahead = &buf[self.search_idx..];
+
+            let maybe_boundary = memchr(self.boundary[0], lookahead);
+
+            debug!("maybe_boundary: {:?}", maybe_boundary);
+
+            self.search_idx = match maybe_boundary {
+                Some(boundary_start) => self.search_idx + boundary_start,
+                None => buf.len(),
+            };
+
+            if self.search_idx + self.boundary.len() <= buf.len() {
+                let test = &buf[self.search_idx .. self.search_idx + self.boundary.len()];
+
+                match first_nonmatching_idx(test, &self.boundary) {
+                    Some(idx) => self.search_idx += idx,
+                    None => self.boundary_read = true,
+                } 
+            } else {
+                break;
+            }            
+        }
+
+         debug!(
+            "After-loop Buf len: {} Search idx: {} Boundary read: {:?}", 
+            buf.len(), self.search_idx, self.boundary_read
+        );
+         
+        let mut buf_end = self.search_idx;
+        
+        if self.boundary_read && self.search_idx >= 2 {
+            let two_bytes_before = &buf[self.search_idx - 2 .. self.search_idx];
+
+            debug!("Two bytes before: {:?} (\"\\r\\n\": {:?})", two_bytes_before, b"\r\n");
+
+            if two_bytes_before == &*b"\r\n" {
+                debug!("Subtract two!");
+                buf_end -= 2;
+            } 
+        }
+    
+        &buf[..buf_end]
+    }
+
+    pub fn consume(&mut self, bytes: usize) {
+        self.search_idx -= cmp::min(bytes, self.search_idx);
+    }
+
+    pub fn reset(&mut self) {
+        self.search_idx = 0;
+        self.boundary_read = false;
+    }
+
+    pub fn set_boundary<B: Into<Vec<u8>>>(&mut self, boundary: B) -> Vec<u8> {
+        self.reset();
+        mem::replace(&mut self.boundary, boundary.into())
+    }
+
+    pub fn boundary(&self) -> &[u8] {
+        &self.boundary
+    }
+
+    pub fn search_idx(&self) -> usize {
+        self.search_idx
+    }
+
+    pub fn boundary_read(&self) -> bool {
+        self.boundary_read
+    }
+}
+
 
 fn first_nonmatching_idx(left: &[u8], right: &[u8]) -> Option<usize> {
     for (idx, (lb, rb)) in left.iter().zip(right).enumerate() {
