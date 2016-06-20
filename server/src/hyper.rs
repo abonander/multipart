@@ -9,12 +9,14 @@
 //!
 //! Also contains an implementation of [`HttpRequest`](../trait.HttpRequest.html)`
 //! for `hyper::server::Request` and `&mut hyper::server::Request`.
-use hyper::net::Fresh;
-use hyper::header::ContentType;
-use hyper::method::Method;
-use hyper::server::{Handler, Request, Response};
+extern crate hyper;
 
-pub use hyper::server::Request as HyperRequest;
+use self::hyper::net::Fresh;
+use self::hyper::header::ContentType;
+use self::hyper::method::Method;
+use self::hyper::server::{Handler, Request, Response};
+
+pub use self::hyper::server::Request as HyperRequest;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 

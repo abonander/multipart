@@ -2,10 +2,12 @@
 //! (optional, enables `hyper` feature).
 //!
 //! Not shown here: [`impl HttpRequest for &mut nickel::Request`](../trait.HttpRequest.html#implementors).
+extern crate hyper;
+extern crate nickel;
 
-use nickel::Request as NickelRequest;
+use self::nickel::Request as NickelRequest;
 
-use hyper::server::Request as HyperRequest;
+use self::hyper::server::Request as HyperRequest;
 
 use super::HttpRequest;
 

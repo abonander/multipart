@@ -11,6 +11,15 @@
 //! to accept, parse, and serve HTTP `multipart/form-data` requests (file uploads).
 //!
 //! See the `Multipart` struct for more info.
+#![warn(missing_docs)]
+#[macro_use] extern crate log;
+
+extern crate mime;
+extern crate rand;
+extern crate buf_redux;
+extern crate memchr;
+extern crate tempdir;
+
 use mime::Mime;
 
 use tempdir::TempDir;
@@ -341,7 +350,7 @@ impl ContentType {
 }
 
 fn read_content_type(cont_type: &str) -> Mime {
-    cont_type.parse().ok().unwrap_or_else(::mime_guess::octet_stream)
+    cont_type.parse().ok().unwrap_or_else(|| "application/octet-stream".parse().unwrap())
 }
 
 struct ContentDisp {
@@ -808,4 +817,9 @@ fn create_full_path(path: &Path) -> io::Result<File> {
     }
 
     File::create(&path)
+}
+
+fn random_alphanumeric(len: usize) -> String {
+    use rand::Rng;
+    rand::thread_rng().gen_ascii_chars().take(len).collect()
 }

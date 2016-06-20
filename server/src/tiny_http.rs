@@ -3,8 +3,9 @@
 //!
 //! Contains `impl `[`HttpRequest`](../trait.HttpRequest.html)` for tiny_http::Request` (not shown
 //! here; see [`HttpRequest`'s implementors](../trait.HttpRequest.html#implementors)).
+extern crate tiny_http;
 
-pub use tiny_http::Request as TinyHttpRequest;
+pub use self::tiny_http::Request as TinyHttpRequest;
 
 use super::HttpRequest;
 

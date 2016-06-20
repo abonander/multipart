@@ -2,12 +2,13 @@
 //!
 //! Not shown here: `impl `[`HttpRequest`](../trait.HttpRequest.html#implementors)` for
 //! iron::Request`.
+extern crate iron;
 
-use iron::headers::ContentType;
-use iron::mime::{Mime, TopLevel, SubLevel};
-use iron::request::{Body as IronBody, Request as IronRequest};
-use iron::typemap::Key;
-use iron::{BeforeMiddleware, IronError, IronResult};
+use self::iron::headers::ContentType;
+use self::iron::mime::{Mime, TopLevel, SubLevel};
+use self::iron::request::{Body as IronBody, Request as IronRequest};
+use self::iron::typemap::Key;
+use self::iron::{BeforeMiddleware, IronError, IronResult};
 
 use std::path::PathBuf;
 use std::{error, fmt};
