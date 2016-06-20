@@ -1,5 +1,3 @@
-/target
-/Cargo.lock
 *.swp
 *~
 # Compiled files
@@ -7,6 +5,10 @@
 *.so
 *.rlib
 *.dll
+
+*/.idea/
+*/target
+*/Cargo.lock
 
 # Executables
 *.exe
