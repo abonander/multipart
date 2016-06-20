@@ -8,6 +8,14 @@
 //! default).
 //!
 //! Use this when sending POST requests with files to a server.
+#![warn(missing_docs)]
+
+#[macro_use] extern crate log;
+
+extern crate mime;
+extern crate mime_guess;
+extern crate rand;
+
 use mime::Mime;
 
 use std::borrow::Cow;
@@ -35,6 +43,41 @@ macro_rules! map_self {
             Err(err) => Err(err.into()),
         }
     )
+}
+
+/// Chain a series of results together, with or without previous results.
+///
+/// ```
+/// #[macro_use] extern crate multipart;
+///
+/// fn try_add_one(val: u32) -> Result<u32, u32> {
+///     if val < 5 {
+///         Ok(val + 1)
+///     } else {
+///         Err(val)
+///     }
+/// }
+///
+/// fn main() {
+///     let res = chain_result! {
+///         try_add_one(1),
+///         prev -> try_add_one(prev),
+///         prev -> try_add_one(prev),
+///         prev -> try_add_one(prev)
+///     };
+///
+///     println!("{:?}", res);
+/// }
+///
+/// ```
+#[macro_export]
+macro_rules! chain_result {
+    ($first_expr:expr, $($try_expr:expr),*) => (
+        $first_expr $(.and_then(|_| $try_expr))*
+    );
+    ($first_expr:expr, $($($arg:ident),+ -> $try_expr:expr),*) => (
+        $first_expr $(.and_then(|$($arg),+| $try_expr))*
+    );
 }
 
 /// The entry point of the client-side multipart API.
@@ -266,4 +309,9 @@ fn mime_filename(path: &Path) -> (Mime, Option<&str>) {
 
 fn opt_filename(path: &Path) -> Option<&str> {
     path.file_name().and_then(|filename| filename.to_str())
+}
+
+fn random_alphanumeric(len: usize) -> String {
+    use rand::Rng;
+    rand::thread_rng().gen_ascii_chars().take(len).collect()
 }

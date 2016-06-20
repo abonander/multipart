@@ -10,7 +10,7 @@ use std::path::Path;
 use std::io::prelude::*;
 use std::{fmt, io, mem};
 
-use super::{HttpRequest, HttpStream, MultipartWriter};
+use ::{HttpRequest, HttpStream, MultipartWriter};
 
 macro_rules! try_lazy (
     ($field:expr, $try:expr) => (
@@ -391,8 +391,10 @@ impl<'d> AsRef<[u8]> for CowStrAsRef<'d> {
 
 #[cfg(feature = "hyper")]
 mod hyper {
-    use hyper::client::{Body, Client, IntoUrl, RequestBuilder, Response};
-    use hyper::Result as HyperResult;
+    extern crate hyper;
+
+    use self::hyper::client::{Body, Client, IntoUrl, RequestBuilder, Response};
+    use self::hyper::Result as HyperResult;
 
     impl<'n, 'd> super::Multipart<'n, 'd> {
         /// #### Feature: `hyper`
@@ -423,7 +425,7 @@ mod hyper {
             
             
             mut_fn(client.post(url))
-                .header(::client::hyper::content_type(fields.boundary()))
+                .header(::hyper::content_type(fields.boundary()))
                 .body(fields.to_body())
                 .send() 
         }

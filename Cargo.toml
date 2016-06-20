@@ -15,42 +15,21 @@ documentation = "http://cybergeek94.github.io/multipart/doc/multipart/index.html
 
 license = "MIT OR Apache-2.0"
 
-[dependencies]
-env_logger = "0.3"
+[dependencies.multipart-client]
+path = "client/"
+optional = true
+
+[dependencies.multipart-server]
+path = "server/"
+optional = true
+
+[dev-dependencies]
 log = "0.3"
-mime = "0.2"
-mime_guess = "1.6"
+env_logger = "0.3"
 rand = "0.3"
-tempdir = "0.3"
-
-[dependencies.buf_redux]
-optional = true
-version = "0.1"
-
-[dependencies.hyper]
-optional = true
-version = "0.8"
-
-[dependencies.iron]
-optional = true
-version = "0.3"
-
-[dependencies.memchr]
-optional = true
-version = "0.1"
-
-# NOTE: use `nickel_` feature, as `hyper` feature is required.
-[dependencies.nickel]
-optional = true
-version = "0.8"
-
-[dependencies.tiny_http]
-optional = true
-version = "0.5"
 
 [features]
-client = []
-default = ["hyper", "server", "client"]
-server = ["buf_redux", "memchr"]
-nickel_ = ["nickel", "hyper"]
-all = ["iron", "nickel_", "tiny_http"]
+client = ["multipart-client"]
+server = ["multipart-server"]
+default = ["client", "server"]
+

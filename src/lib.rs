@@ -27,73 +27,24 @@
 //! See the [`server::nickel`](server/nickel/index.html) module for more information. Enables the `hyper`
 //! feature.
 #![warn(missing_docs)]
-#[macro_use] extern crate log;
-extern crate env_logger;
 
-extern crate mime;
-extern crate mime_guess;
-extern crate rand;
-
-extern crate tempdir;
-
-#[cfg(feature = "hyper")]
-extern crate hyper;
-
-#[cfg(feature = "iron")]
-extern crate iron;
-
-#[cfg(feature = "nickel")]
-extern crate nickel;
-
-#[cfg(feature = "tiny_http")]
-extern crate tiny_http;
-
-use rand::Rng;
-
-/// Chain a series of results together, with or without previous results.
-///
-/// ```
-/// #[macro_use] extern crate multipart;
-///
-/// fn try_add_one(val: u32) -> Result<u32, u32> {
-///     if val < 5 {
-///         Ok(val + 1)
-///     } else {
-///         Err(val)
-///     }
-/// }
-/// 
-/// fn main() {
-///     let res = chain_result! {
-///         try_add_one(1),
-///         prev -> try_add_one(prev),
-///         prev -> try_add_one(prev),
-///         prev -> try_add_one(prev)
-///     };
-///
-///     println!("{:?}", res);
-/// }
-///
-/// ```
-#[macro_export]
-macro_rules! chain_result {
-    ($first_expr:expr, $($try_expr:expr),*) => (
-        $first_expr $(.and_then(|_| $try_expr))*
-    );
-    ($first_expr:expr, $($($arg:ident),+ -> $try_expr:expr),*) => (
-        $first_expr $(.and_then(|$($arg),+| $try_expr))*
-    );
-}
+// Needs to be at crate root
+#[cfg(all(test, feature = "client", feature = "server"))]
+#[macro_use]
+extern crate log;
 
 #[cfg(feature = "client")]
-pub mod client;
+#[doc(hidden)]
+pub extern crate multipart_client;
+
 #[cfg(feature = "server")]
-pub mod server;
+#[doc(hidden)]
+pub extern crate multipart_server;
+
+pub use multipart_client as client;
+pub use multipart_server as server;
 
 #[cfg(all(test, feature = "client", feature = "server"))]
 mod local_test;
 
-fn random_alphanumeric(len: usize) -> String {
-    rand::thread_rng().gen_ascii_chars().take(len).collect()
-}
 

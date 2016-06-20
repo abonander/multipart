@@ -1,0 +1,17 @@
+[package]
+name = "multipart-client"
+version = "0.1.0"
+authors = ["Austin Bonander <austin.bonander@gmail.com>"]
+
+[dependencies]
+log = "0.3"
+mime = ">=0.2,<0.3"
+mime_guess = "1.6"
+rand = "0.3"
+
+[dependencies.hyper]
+version = ">=0.8, <0.10"
+optional = true
+
+[features]
+default = ["hyper"]

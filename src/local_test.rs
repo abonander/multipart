@@ -4,13 +4,16 @@
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
+extern crate env_logger;
+extern crate rand;
+
 use client::HttpRequest as ClientRequest;
 use client::HttpStream as ClientStream;
 
 use server::HttpRequest as ServerRequest;
 
-use rand::Rng;
-use rand::distributions::{Range, Sample};
+use self::rand::Rng;
+use self::rand::distributions::{Range, Sample};
 
 use std::collections::HashMap;
 use std::io;
@@ -24,7 +27,7 @@ struct TestFields {
 
 #[test]
 fn local_test() {
-    let _ = ::env_logger::init(); 
+    let _ = self::env_logger::init();
 
     let test_fields = gen_test_fields();
 
@@ -52,14 +55,14 @@ fn gen_test_fields() -> TestFields {
 }
 
 fn gen_range(min: usize, max: usize) -> usize {
-    Range::new(min, max).sample(&mut ::rand::weak_rng())
+    Range::new(min, max).sample(&mut self::rand::weak_rng())
 }
 
 fn gen_string() -> String {
     const MIN_LEN: usize = 3;
     const MAX_LEN: usize = 8;
 
-    let mut rng = ::rand::weak_rng();
+    let mut rng = self::rand::weak_rng();
     let str_len = gen_range(MIN_LEN, MAX_LEN);
 
     rng.gen_ascii_chars().take(str_len).collect()
@@ -69,7 +72,7 @@ fn gen_bytes() -> Vec<u8> {
     const MIN_LEN: usize = 8;
     const MAX_LEN: usize = 16;
 
-    let mut rng = ::rand::weak_rng();
+    let mut rng = self::rand::weak_rng();
     let bytes_len = gen_range(MIN_LEN, MAX_LEN);
 
     rng.gen_ascii_chars().take(bytes_len)

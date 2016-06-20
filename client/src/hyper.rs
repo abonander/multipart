@@ -12,13 +12,15 @@
 //! Also see: [`lazy::Multipart::client_request()`](../lazy/struct.Multipart.html#method.client_request)
 //! and [`lazy::Multipart::client_request_mut()`](../lazy/struct.Multipart.html#method.client_request_mut)
 //! (adaptors for `hyper::client::RequestBuilder`).
-use hyper::client::request::Request;
-use hyper::client::response::Response;
-use hyper::header::{ContentType, ContentLength};
-use hyper::method::Method;
-use hyper::net::{Fresh, Streaming};
+extern crate hyper;
 
-use hyper::Error as HyperError;
+use self::hyper::client::request::Request;
+use self::hyper::client::response::Response;
+use self::hyper::header::{ContentType, ContentLength};
+use self::hyper::method::Method;
+use self::hyper::net::{Fresh, Streaming};
+
+use self::hyper::Error as HyperError;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 
