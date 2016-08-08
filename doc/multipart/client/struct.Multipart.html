@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Multipart` struct in crate `multipart`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Multipart">
+
+    <title>multipart::client::Multipart - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>multipart</a>::<wbr><a href='index.html'>client</a></p><script>window.sidebarCurrent = {name: 'Multipart', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>multipart</a>::<wbr><a href='index.html'>client</a>::<wbr><a class='struct' href=''>Multipart</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-418' class='srclink' href='../../src/multipart/src/client/mod.rs.html#45-47' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Multipart&lt;S&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>The entry point of the client-side multipart API.</p>
+
+<p>Though they perform I/O, the <code>.write_*()</code> methods do not return <code>io::Result&lt;_&gt;</code> in order to
+facilitate method chaining. Upon the first error, all subsequent API calls will be no-ops until
+<code>.send()</code> is called, at which point the error will be reported.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../multipart/client/struct.Multipart.html' title='multipart::client::Multipart'>Multipart</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-421' class='srclink' href='../../src/multipart/src/client/mod.rs.html#49-61' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from_request' class='method'><code>fn <a href='#method.from_request' class='fnname'>from_request</a>&lt;R: <a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>HttpRequest</a>&gt;(req: R) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../multipart/client/struct.Multipart.html' title='multipart::client::Multipart'>Multipart</a>&lt;R::Stream&gt;, R::Error&gt;</code></h4>
+<div class='docblock'><p>Create a new <code>Multipart</code> to wrap a request.</p>
+
+<h2 id='returns-error' class='section-header'><a href='#returns-error'>Returns Error</a></h2>
+<p>If <code>req.open_stream()</code> returns an error.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;S: <a class='trait' href='../../multipart/client/trait.HttpStream.html' title='multipart::client::HttpStream'>HttpStream</a>&gt; <a class='struct' href='../../multipart/client/struct.Multipart.html' title='multipart::client::Multipart'>Multipart</a>&lt;S&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-429' class='srclink' href='../../src/multipart/src/client/mod.rs.html#63-123' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.write_text' class='method'><code>fn <a href='#method.write_text' class='fnname'>write_text</a>&lt;N: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;, V: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;(&amp;mut self, name: N, val: V) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;mut Self, S::Error&gt;</code></h4>
+<div class='docblock'><p>Write a text field to this multipart request.
+<code>name</code> and <code>val</code> can be either owned <code>String</code> or <code>&amp;str</code>.</p>
+
+<h2 id='errors' class='section-header'><a href='#errors'>Errors</a></h2>
+<p>If something went wrong with the HTTP stream.</p>
+</div><h4 id='method.write_file' class='method'><code>fn <a href='#method.write_file' class='fnname'>write_file</a>&lt;N: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;, P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(&amp;mut self, name: N, path: P) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;mut Self, S::Error&gt;</code></h4>
+<div class='docblock'><p>Open a file pointed to by <code>path</code> and write its contents to the multipart request,
+supplying its filename and guessing its <code>Content-Type</code> from its extension.</p>
+
+<p>If you want to set these values manually, or use another type that implements <code>Read</code>, 
+use <code>.write_stream()</code>.</p>
+
+<p><code>name</code> can be either <code>String</code> or <code>&amp;str</code>, and <code>path</code> can be <code>PathBuf</code> or <code>&amp;Path</code>.</p>
+
+<h2 id='errors-1' class='section-header'><a href='#errors-1'>Errors</a></h2>
+<p>If there was a problem opening the file (was a directory or didn&#39;t exist),
+or if something went wrong with the HTTP stream.</p>
+</div><h4 id='method.write_stream' class='method'><code>fn <a href='#method.write_stream' class='fnname'>write_stream</a>&lt;N: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;, St: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a>&gt;(&amp;mut self, name: N, stream: &amp;mut St, filename: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;, content_type: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://hyperium.github.io/mime.rs/mime/struct.Mime.html' title='mime::Mime'>Mime</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;mut Self, S::Error&gt;</code></h4>
+<div class='docblock'><p>Write a byte stream to the multipart request as a file field, supplying <code>filename</code> if given,
+and <code>content_type</code> if given or <code>&quot;application/octet-stream&quot;</code> if not.</p>
+
+<p><code>name</code> can be either <code>String</code> or <code>&amp;str</code>, and <code>read</code> can take the <code>Read</code> by-value or
+with an <code>&amp;mut</code> borrow.</p>
+
+<h2 id='warning' class='section-header'><a href='#warning'>Warning</a></h2>
+<p>The given <code>Read</code> <strong>must</strong> be able to read to EOF (end of file/no more data), meaning
+<code>Read::read()</code> returns <code>Ok(0)</code>. If it never returns EOF it will be read to infinity 
+and the request will never be completed.</p>
+
+<p>When using <code>SizedRequest</code> this also can cause out-of-control memory usage as the
+multipart data has to be written to an in-memory buffer so its size can be calculated.</p>
+
+<p>Use <code>Read::take()</code> if you wish to send data from a <code>Read</code> 
+that will never return EOF otherwise.</p>
+
+<h2 id='errors-2' class='section-header'><a href='#errors-2'>Errors</a></h2>
+<p>If the reader returned an error, or if something went wrong with the HTTP stream.</p>
+</div><h4 id='method.send' class='method'><code>fn <a href='#method.send' class='fnname'>send</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;S::Response, S::Error&gt;</code></h4>
+<div class='docblock'><p>Finalize the request and return the response from the server, or the last error if set.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;R: <a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>HttpRequest</a>&gt; <a class='struct' href='../../multipart/client/struct.Multipart.html' title='multipart::client::Multipart'>Multipart</a>&lt;<a class='struct' href='../../multipart/client/struct.SizedRequest.html' title='multipart::client::SizedRequest'>SizedRequest</a>&lt;R&gt;&gt; <span class='where'>where R::Stream::Error: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;R::Error&gt;</span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-461' class='srclink' href='../../src/multipart/src/client/mod.rs.html#125-131' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from_request_sized' class='method'><code>fn <a href='#method.from_request_sized' class='fnname'>from_request_sized</a>(req: R) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;Self, R::Error&gt;</code></h4>
+<div class='docblock'><p>Create a new <code>Multipart</code> using the <code>SizedRequest</code> wrapper around <code>req</code>.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "multipart";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

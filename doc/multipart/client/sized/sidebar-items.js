@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SizedRequest","A wrapper around a request object that measures the request body and sets the `Content-Length` header to its size in bytes."]]});

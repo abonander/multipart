@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `SizedRequest` struct in crate `multipart`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, SizedRequest">
+
+    <title>multipart::client::SizedRequest - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>multipart</a>::<wbr><a href='index.html'>client</a></p><script>window.sidebarCurrent = {name: 'SizedRequest', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>multipart</a>::<wbr><a href='index.html'>client</a>::<wbr><a class='struct' href=''>SizedRequest</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-377' class='srclink' href='../../src/multipart/src/client/sized.rs.html#27-31' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct SizedRequest&lt;R&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>A wrapper around a request object that measures the request body and sets the <code>Content-Length</code>
+header to its size in bytes.</p>
+
+<p>Sized requests are more human-readable and use less bandwidth 
+(as chunking adds <a href="http://en.wikipedia.org/wiki/Chunked_transfer_encoding#Example">visual noise and overhead</a>),
+but they must be able to load their entirety, including the contents of all files
+and streams, into memory so the request body can be measured.</p>
+
+<p>You should really only use sized requests if you intend to inspect the data manually on the
+server side, as it will produce a more human-readable request body. Also, of course, if the
+server doesn&#39;t support chunked requests or otherwise rejects them. </p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;R&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a> for <a class='struct' href='../../multipart/client/struct.SizedRequest.html' title='multipart::client::SizedRequest'>SizedRequest</a>&lt;R&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-386' class='srclink' href='../../src/multipart/src/client/sized.rs.html#44-50' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.write' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html#tymethod.write' class='fnname'>write</a>(&amp;mut self, data: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>&gt;</code></h4>
+<div class='docblock'><p>Write a buffer into this object, returning how many bytes were written. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Write.html#tymethod.write">Read more</a></p>
+</div><h4 id='method.flush' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html#tymethod.flush' class='fnname'>flush</a>(&amp;mut self) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h4>
+<div class='docblock'><p>Flush this output stream, ensuring that all intermediately buffered contents reach their destination. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Write.html#tymethod.flush">Read more</a></p>
+</div><h4 id='method.write_all' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html#method.write_all' class='fnname'>write_all</a>(&amp;mut self, buf: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Attempts to write an entire buffer into this write. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Write.html#method.write_all">Read more</a></p>
+</div><h4 id='method.write_fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html#method.write_fmt' class='fnname'>write_fmt</a>(&amp;mut self, fmt: <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Arguments.html' title='core::fmt::Arguments'>Arguments</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Writes a formatted string into this writer, returning any error encountered. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Write.html#method.write_fmt">Read more</a></p>
+</div><h4 id='method.by_ref' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html#method.by_ref' class='fnname'>by_ref</a>(&amp;mut self) -&gt; &amp;mut Self</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Creates a &quot;by reference&quot; adaptor for this instance of <code>Write</code>. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Write.html#method.by_ref">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;R: <a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>HttpRequest</a>&gt; <a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>HttpRequest</a> for <a class='struct' href='../../multipart/client/struct.SizedRequest.html' title='multipart::client::SizedRequest'>SizedRequest</a>&lt;R&gt; <span class='where'>where R::Stream::Error: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;R::Error&gt;</span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-393' class='srclink' href='../../src/multipart/src/client/sized.rs.html#52-68' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='associatedtype.Stream' class='type'><code>type <a href='../../multipart/client/trait.HttpRequest.html#associatedtype.Stream' class='type'>Stream</a> = Self</code></h4>
+<div class='docblock'><p>The HTTP stream type that can be opend by this request, to which the multipart data will be written. <a href="../../multipart/client/trait.HttpRequest.html#associatedtype.Stream">Read more</a></p>
+</div><h4 id='associatedtype.Error' class='type'><code>type <a href='../../multipart/client/trait.HttpRequest.html#associatedtype.Error' class='type'>Error</a> = R::Error</code></h4>
+<div class='docblock'><p>The error type for this request. Must be compatible with <code>io::Error</code> as well as <code>Self::HttpStream::Error</code> <a href="../../multipart/client/trait.HttpRequest.html#associatedtype.Error">Read more</a></p>
+</div><h4 id='method.apply_headers' class='method'><code>fn <a href='../../multipart/client/trait.HttpRequest.html#tymethod.apply_headers' class='fnname'>apply_headers</a>(&amp;mut self, boundary: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, _content_len: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<div class='docblock'><p><code>SizedRequest</code> ignores <code>_content_len</code> because it sets its own later.</p>
+</div><h4 id='method.open_stream' class='method'><code>fn <a href='../../multipart/client/trait.HttpRequest.html#tymethod.open_stream' class='fnname'>open_stream</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;Self, Self::<a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Open the request stream and return it or any error otherwise.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;R: <a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>HttpRequest</a>&gt; <a class='trait' href='../../multipart/client/trait.HttpStream.html' title='multipart::client::HttpStream'>HttpStream</a> for <a class='struct' href='../../multipart/client/struct.SizedRequest.html' title='multipart::client::SizedRequest'>SizedRequest</a>&lt;R&gt; <span class='where'>where R::Stream::Error: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;R::Error&gt;</span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-403' class='srclink' href='../../src/multipart/src/client/sized.rs.html#70-90' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='associatedtype.Request' class='type'><code>type <a href='../../multipart/client/trait.HttpStream.html#associatedtype.Request' class='type'>Request</a> = Self</code></h4>
+<div class='docblock'><p>The request type that opened this stream.</p>
+</div><h4 id='associatedtype.Response' class='type'><code>type <a href='../../multipart/client/trait.HttpStream.html#associatedtype.Response' class='type'>Response</a> = R::Stream::Response</code></h4>
+<div class='docblock'><p>The response type that will be returned after the request is completed.</p>
+</div><h4 id='associatedtype.Error-1' class='type'><code>type <a href='../../multipart/client/trait.HttpStream.html#associatedtype.Error' class='type'>Error</a> = R::Stream::Error</code></h4>
+<div class='docblock'><p>The error type for this stream. Must be compatible with <code>io::Error</code> as well as <code>Self::Request::Error</code>. <a href="../../multipart/client/trait.HttpStream.html#associatedtype.Error">Read more</a></p>
+</div><h4 id='method.finish' class='method'><code>fn <a href='../../multipart/client/trait.HttpStream.html#tymethod.finish' class='fnname'>finish</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;Self::<a class='trait' href='../../multipart/client/trait.HttpStream.html' title='multipart::client::HttpStream'>Response</a>, Self::<a class='trait' href='../../multipart/client/trait.HttpStream.html' title='multipart::client::HttpStream'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Finalize and close the stream and return the response object, or any error otherwise.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "multipart";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `SaveDir` enum in crate `multipart`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, SaveDir">
+
+    <title>multipart::server::SaveDir - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>multipart</a>::<wbr><a href='index.html'>server</a></p><script>window.sidebarCurrent = {name: 'SaveDir', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>multipart</a>::<wbr><a href='index.html'>server</a>::<wbr><a class='enum' href=''>SaveDir</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-1401' class='srclink' href='../../src/multipart/src/server/mod.rs.html#662-668' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum SaveDir {
+    Temp(<a class='struct' href='https://doc.rust-lang.org/tempdir/tempdir/struct.TempDir.html' title='tempdir::TempDir'>TempDir</a>),
+    Perm(<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>),
+}</pre><div class='docblock'><p>The save directory for <code>Entries</code>. May be temporary (delete-on-drop) or permanent.</p>
+</div><h2 class='variants'>Variants</h2>
+<table class='variants_table'><tr><td id='variant.Temp'><code>Temp</code></td><td><div class='docblock'><p>This directory is temporary and will be deleted, along with its contents, when this wrapper
+is dropped.</p>
+</div></td><td></td></tr><tr><td id='variant.Perm'><code>Perm</code></td><td><div class='docblock'><p>This directory is permanent and will be left on the filesystem when this wrapper is dropped.</p>
+</div></td><td></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='enum' href='../../multipart/server/enum.SaveDir.html' title='multipart::server::SaveDir'>SaveDir</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1406' class='srclink' href='../../src/multipart/src/server/mod.rs.html#670-733' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.as_path' class='method'><code>fn <a href='#method.as_path' class='fnname'>as_path</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a></code></h4>
+<div class='docblock'><p>Get the path of this directory, either temporary or permanent.</p>
+</div><h4 id='method.is_temporary' class='method'><code>fn <a href='#method.is_temporary' class='fnname'>is_temporary</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<div class='docblock'><p>Returns <code>true</code> if this is a temporary directory which will be deleted on-drop.</p>
+</div><h4 id='method.into_path' class='method'><code>fn <a href='#method.into_path' class='fnname'>into_path</a>(self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a></code></h4>
+<div class='docblock'><p>Unwrap the <code>PathBuf</code> from <code>self</code>; if this is a temporary directory,
+it will be converted to a permanent one.</p>
+</div><h4 id='method.keep' class='method'><code>fn <a href='#method.keep' class='fnname'>keep</a>(&amp;mut self)</code></h4>
+<div class='docblock'><p>If this <code>SaveDir</code> is temporary, convert it to permanent.
+This is a no-op if it already is permanent.</p>
+
+<h3 id='warning-potential-data-loss' class='section-header'><a href='#warning-potential-data-loss'>Warning: Potential Data Loss</a></h3>
+<p>Even though this will prevent deletion on-drop, the temporary folder on most OSes
+(where this directory is created by default) can be automatically cleared by the OS at any
+time, usually on reboot or when free space is low.</p>
+
+<p>It is recommended that you relocate the files from a request which you want to keep to a 
+permanent folder on the filesystem.</p>
+</div><h4 id='method.delete' class='method'><code>fn <a href='#method.delete' class='fnname'>delete</a>(self) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h4>
+<div class='docblock'><p>Delete this directory and its contents, regardless of its permanence.</p>
+
+<h3 id='warning-potential-data-loss-1' class='section-header'><a href='#warning-potential-data-loss-1'>Warning: Potential Data Loss</a></h3>
+<p>This is very likely irreversible, depending on the OS implementation.</p>
+
+<p>Files deleted programmatically are deleted directly from disk, as compared to most file
+manager applications which use a staging area from which deleted files can be safely
+recovered (i.e. Windows&#39; Recycle Bin, OS X&#39;s Trash Can, etc.).</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt; for <a class='enum' href='../../multipart/server/enum.SaveDir.html' title='multipart::server::SaveDir'>SaveDir</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1430' class='srclink' href='../../src/multipart/src/server/mod.rs.html#735-739' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.as_ref' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html#tymethod.as_ref' class='fnname'>as_ref</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a></code></h4>
+<div class='docblock'><p>Performs the conversion.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../multipart/server/enum.SaveDir.html' title='multipart::server::SaveDir'>SaveDir</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1433' class='srclink' href='../../src/multipart/src/server/mod.rs.html#743-752' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "multipart";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

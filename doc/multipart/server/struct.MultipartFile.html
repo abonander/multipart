@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `MultipartFile` struct in crate `multipart`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, MultipartFile">
+
+    <title>multipart::server::MultipartFile - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>multipart</a>::<wbr><a href='index.html'>server</a></p><script>window.sidebarCurrent = {name: 'MultipartFile', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>multipart</a>::<wbr><a href='index.html'>server</a>::<wbr><a class='struct' href=''>MultipartFile</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-1296' class='srclink' href='../../src/multipart/src/server/mod.rs.html#499-503' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct MultipartFile&lt;'a, B: 'a&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>A representation of a file in HTTP <code>multipart/form-data</code>.</p>
+
+<p>Note that the file is not yet saved to the local filesystem; 
+instead, this struct exposes <code>Read</code> and <code>BufRead</code> impls which point
+to the beginning of the file&#39;s contents in the HTTP stream. </p>
+
+<p>You can read it to EOF, or use one of the <code>save_*()</code> methods here 
+to save it to disk.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a, B: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a>&gt; <a class='struct' href='../../multipart/server/struct.MultipartFile.html' title='multipart::server::MultipartFile'>MultipartFile</a>&lt;'a, B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1312' class='srclink' href='../../src/multipart/src/server/mod.rs.html#505-614' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.save_to' class='method'><code>fn <a href='#method.save_to' class='fnname'>save_to</a>&lt;W: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a>&gt;(&amp;mut self, out: W) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>&gt;</code></h4>
+<div class='docblock'><p>Save this file to the given output stream.</p>
+
+<p>If successful, returns the number of bytes written.</p>
+
+<p>Retries when <code>io::Error::kind() == io::ErrorKind::Interrupted</code>.</p>
+</div><h4 id='method.save_to_limited' class='method'><code>fn <a href='#method.save_to_limited' class='fnname'>save_to_limited</a>&lt;W: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a>&gt;(&amp;mut self, out: W, limit: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>&gt;</code></h4>
+<div class='docblock'><p>Save this file to the given output stream, <strong>truncated</strong> to <code>limit</code>
+(no more than <code>limit</code> bytes will be written out).</p>
+
+<p>If successful, returns the number of bytes written.</p>
+
+<p>Retries when <code>io::Error::kind() == io::ErrorKind::Interrupted</code>.</p>
+</div><h4 id='method.save_as' class='method'><code>fn <a href='#method.save_as' class='fnname'>save_as</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;(&amp;mut self, path: P) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='struct' href='../../multipart/server/struct.SavedFile.html' title='multipart::server::SavedFile'>SavedFile</a>&gt;</code></h4>
+<div class='docblock'><p>Save this file to <code>path</code>.</p>
+
+<p>Returns the saved file info on success, or any errors otherwise.</p>
+
+<p>Retries when <code>io::Error::kind() == io::ErrorKind::Interrupted</code>.</p>
+</div><h4 id='method.save_in' class='method'><code>fn <a href='#method.save_in' class='fnname'>save_in</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(&amp;mut self, dir: P) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='struct' href='../../multipart/server/struct.SavedFile.html' title='multipart::server::SavedFile'>SavedFile</a>&gt;</code></h4>
+<div class='docblock'><p>Save this file in the directory pointed at by <code>dir</code>,
+using a random alphanumeric string as the filename.</p>
+
+<p>Any missing directories in the <code>dir</code> path will be created.</p>
+
+<p>Returns the saved file&#39;s info on success, or any errors otherwise.</p>
+
+<p>Retries when <code>io::Error::kind() == io::ErrorKind::Interrupted</code>.</p>
+</div><h4 id='method.save_as_limited' class='method'><code>fn <a href='#method.save_as_limited' class='fnname'>save_as_limited</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;(&amp;mut self, path: P, limit: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='struct' href='../../multipart/server/struct.SavedFile.html' title='multipart::server::SavedFile'>SavedFile</a>&gt;</code></h4>
+<div class='docblock'><p>Save this file to <code>path</code>, <strong>truncated</strong> to <code>limit</code> (no more than <code>limit</code> bytes will be written out).</p>
+
+<p>Any missing directories in the <code>dir</code> path will be created.</p>
+
+<p>Returns the saved file&#39;s info on success, or any errors otherwise.</p>
+
+<p>Retries when <code>io::Error::kind() == io::ErrorKind::Interrupted</code>.</p>
+</div><h4 id='method.save_in_limited' class='method'><code>fn <a href='#method.save_in_limited' class='fnname'>save_in_limited</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(&amp;mut self, dir: P, limit: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='struct' href='../../multipart/server/struct.SavedFile.html' title='multipart::server::SavedFile'>SavedFile</a>&gt;</code></h4>
+<div class='docblock'><p>Save this file in the directory pointed at by <code>dir</code>,
+using a random alphanumeric string as the filename.</p>
+
+<p><strong>Truncates</strong> file to <code>limit</code> (no more than <code>limit</code> bytes will be written out).</p>
+
+<p>Any missing directories in the <code>dir</code> path will be created.</p>
+
+<p>Returns the saved file&#39;s info on success, or any errors otherwise.</p>
+
+<p>Retries when <code>io::Error::kind() == io::ErrorKind::Interrupted</code>.</p>
+</div><h4 id='method.filename' class='method'><code>fn <a href='#method.filename' class='fnname'>filename</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</code></h4>
+<div class='docblock'><p>Get the filename of this entry, if supplied.</p>
+
+<h2 id='warning' class='section-header'><a href='#warning'>Warning</a></h2>
+<p>You should treat this value as untrustworthy because it is an arbitrary string provided by
+the client. You should <em>not</em> blindly append it to a directory path and save the file there, 
+as such behavior could easily be exploited by a malicious client.</p>
+</div><h4 id='method.content_type' class='method'><code>fn <a href='#method.content_type' class='fnname'>content_type</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://hyperium.github.io/mime.rs/mime/struct.Mime.html' title='mime::Mime'>Mime</a></code></h4>
+<div class='docblock'><p>Get the MIME type (<code>Content-Type</code> value) of this file, if supplied by the client,
+or <code>&quot;applicaton/octet-stream&quot;</code> otherwise.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a, B: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> for <a class='struct' href='../../multipart/server/struct.MultipartFile.html' title='multipart::server::MultipartFile'>MultipartFile</a>&lt;'a, B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1368' class='srclink' href='../../src/multipart/src/server/mod.rs.html#616-620' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.read' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html#tymethod.read' class='fnname'>read</a>(&amp;mut self, buf: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>&gt;</code></h4>
+<div class='docblock'><p>Pull some bytes from this source into the specified buffer, returning how many bytes were read. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html#tymethod.read">Read more</a></p>
+</div><h4 id='method.read_to_end' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.read_to_end' class='fnname'>read_to_end</a>(&amp;mut self, buf: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Read all bytes until EOF in this source, placing them into <code>buf</code>. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.read_to_end">Read more</a></p>
+</div><h4 id='method.read_to_string' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.read_to_string' class='fnname'>read_to_string</a>(&amp;mut self, buf: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Read all bytes until EOF in this source, placing them into <code>buf</code>. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.read_to_string">Read more</a></p>
+</div><h4 id='method.read_exact' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.read_exact' class='fnname'>read_exact</a>(&amp;mut self, buf: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;</code><div class='since' title='Stable since Rust version 1.6.0'>1.6.0</div></h4>
+<div class='docblock'><p>Read the exact number of bytes required to fill <code>buf</code>. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.read_exact">Read more</a></p>
+</div><h4 id='method.by_ref' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.by_ref' class='fnname'>by_ref</a>(&amp;mut self) -&gt; &amp;mut Self</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Creates a &quot;by reference&quot; adaptor for this instance of <code>Read</code>. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.by_ref">Read more</a></p>
+</div><h4 id='method.bytes' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.bytes' class='fnname'>bytes</a>(self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/struct.Bytes.html' title='std::io::Bytes'>Bytes</a>&lt;Self&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Transforms this <code>Read</code> instance to an <code>Iterator</code> over its bytes. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.bytes">Read more</a></p>
+</div><h4 id='method.chars' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.chars' class='fnname'>chars</a>(self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/struct.Chars.html' title='std::io::Chars'>Chars</a>&lt;Self&gt;</code></h4>
+<div class='docblock'><p>Transforms this <code>Read</code> instance to an <code>Iterator</code> over <code>char</code>s. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.chars">Read more</a></p>
+</div><h4 id='method.chain' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.chain' class='fnname'>chain</a>&lt;R&gt;(self, next: R) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/struct.Chain.html' title='std::io::Chain'>Chain</a>&lt;Self, R&gt; <span class='where'>where R: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a></span></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Creates an adaptor which will chain this stream with another. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.chain">Read more</a></p>
+</div><h4 id='method.take' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.take' class='fnname'>take</a>(self, limit: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/struct.Take.html' title='std::io::Take'>Take</a>&lt;Self&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Creates an adaptor which will read at most <code>limit</code> bytes from it. <a href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html#method.take">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;'a, B: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html' title='std::io::BufRead'>BufRead</a> for <a class='struct' href='../../multipart/server/struct.MultipartFile.html' title='multipart::server::MultipartFile'>MultipartFile</a>&lt;'a, B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1374' class='srclink' href='../../src/multipart/src/server/mod.rs.html#622-630' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fill_buf' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#tymethod.fill_buf' class='fnname'>fill_buf</a>(&amp;mut self) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;</code></h4>
+<div class='docblock'><p>Fills the internal buffer of this object, returning the buffer contents. <a href="https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#tymethod.fill_buf">Read more</a></p>
+</div><h4 id='method.consume' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#tymethod.consume' class='fnname'>consume</a>(&amp;mut self, amt: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>)</code></h4>
+<div class='docblock'><p>Tells this buffer that <code>amt</code> bytes have been consumed from the buffer, so they should no longer be returned in calls to <code>read</code>. <a href="https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#tymethod.consume">Read more</a></p>
+</div><h4 id='method.read_until' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#method.read_until' class='fnname'>read_until</a>(&amp;mut self, byte: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>, buf: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Read all bytes into <code>buf</code> until the delimiter <code>byte</code> is reached. <a href="https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#method.read_until">Read more</a></p>
+</div><h4 id='method.read_line' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#method.read_line' class='fnname'>read_line</a>(&amp;mut self, buf: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Read all bytes until a newline (the 0xA byte) is reached, and append them to the provided buffer. <a href="https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#method.read_line">Read more</a></p>
+</div><h4 id='method.split' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#method.split' class='fnname'>split</a>(self, byte: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/struct.Split.html' title='std::io::Split'>Split</a>&lt;Self&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Returns an iterator over the contents of this reader split on the byte <code>byte</code>. <a href="https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#method.split">Read more</a></p>
+</div><h4 id='method.lines' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#method.lines' class='fnname'>lines</a>(self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/struct.Lines.html' title='std::io::Lines'>Lines</a>&lt;Self&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Returns an iterator over the lines of this reader. <a href="https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html#method.lines">Read more</a></p>
+</div></div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><span class='in-band'><code>impl&lt;'a, B: <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> + 'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../multipart/server/struct.MultipartFile.html' title='multipart::server::MultipartFile'>MultipartFile</a>&lt;'a, B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1302' class='srclink' href='../../src/multipart/src/server/mod.rs.html#498' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "multipart";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

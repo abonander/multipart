@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `HttpRequest` trait in crate `multipart`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, HttpRequest">
+
+    <title>multipart::client::HttpRequest - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>multipart</a>::<wbr><a href='index.html'>client</a></p><script>window.sidebarCurrent = {name: 'HttpRequest', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content trait">
+<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>multipart</a>::<wbr><a href='index.html'>client</a>::<wbr><a class='trait' href=''>HttpRequest</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-465' class='srclink' href='../../src/multipart/src/client/mod.rs.html#134-151' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait HttpRequest {
+    type <a href='#associatedtype.Stream' class='type'>Stream</a>: <a class='trait' href='../../multipart/client/trait.HttpStream.html' title='multipart::client::HttpStream'>HttpStream</a>;
+    type <a href='#associatedtype.Error' class='type'>Error</a>: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;Self::<a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>Stream</a>::Error&gt;;
+    fn <a href='#tymethod.apply_headers' class='fnname'>apply_headers</a>(&amp;mut self, boundary: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, content_len: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
+    fn <a href='#tymethod.open_stream' class='fnname'>open_stream</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;Self::<a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>Stream</a>, Self::<a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>Error</a>&gt;;
+}</pre><div class='docblock'><p>A trait describing an HTTP request that can be used to send multipart data.</p>
+</div>
+            <h2 id='associated-types'>Associated Types</h2>
+            <div class='methods'>
+        <h3 id='associatedtype.Stream' class='method stab '><code>type <a href='#associatedtype.Stream' class='type'>Stream</a>: <a class='trait' href='../../multipart/client/trait.HttpStream.html' title='multipart::client::HttpStream'>HttpStream</a></code></h3><div class='docblock'><p>The HTTP stream type that can be opend by this request, to which the multipart data will be
+written.</p>
+</div><h3 id='associatedtype.Error' class='method stab '><code>type <a href='#associatedtype.Error' class='type'>Error</a>: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;Self::<a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>Stream</a>::Error&gt;</code></h3><div class='docblock'><p>The error type for this request.
+Must be compatible with <code>io::Error</code> as well as <code>Self::HttpStream::Error</code></p>
+</div></div>
+            <h2 id='required-methods'>Required Methods</h2>
+            <div class='methods'>
+        <h3 id='tymethod.apply_headers' class='method stab '><code>fn <a href='#tymethod.apply_headers' class='fnname'>apply_headers</a>(&amp;mut self, boundary: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, content_len: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Set the <code>Content-Type</code> header to <code>multipart/form-data</code> and supply the <code>boundary</code> value.
+If <code>content_len</code> is given, set the <code>Content-Length</code> header to its value.</p>
+
+<p>Return <code>true</code> if any and all sanity checks passed and the stream is ready to be opened, 
+or <code>false</code> otherwise.</p>
+</div><h3 id='tymethod.open_stream' class='method stab '><code>fn <a href='#tymethod.open_stream' class='fnname'>open_stream</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;Self::<a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>Stream</a>, Self::<a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>Error</a>&gt;</code></h3><div class='docblock'><p>Open the request stream and return it or any error otherwise.</p>
+</div></div>
+        <h2 id='implementors'>Implementors</h2>
+        <ul class='item-list' id='implementors-list'>
+    <li><code>impl HttpRequest for <a class='struct' href='https://hyperium.github.io/hyper/hyper/client/request/struct.Request.html' title='hyper::client::request::Request'>Request</a>&lt;<a class='enum' href='https://hyperium.github.io/hyper/hyper/net/enum.Fresh.html' title='hyper::net::Fresh'>Fresh</a>&gt;</code></li>
+<li><code>impl&lt;R: <a class='trait' href='../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>HttpRequest</a>&gt; HttpRequest for <a class='struct' href='../../multipart/client/struct.SizedRequest.html' title='multipart::client::SizedRequest'>SizedRequest</a>&lt;R&gt; <span class='where'>where R::Stream::Error: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;R::Error&gt;</span></code></li>
+<li><code>impl HttpRequest for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a></code></li>
+</ul><script type="text/javascript" async
+                         src="../../implementors/multipart/client/trait.HttpRequest.js">
+                 </script></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "multipart";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

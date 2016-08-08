@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Multipart` struct in crate `multipart`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Multipart">
+
+    <title>multipart::client::lazy::Multipart - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../index.html'>multipart</a>::<wbr><a href='../index.html'>client</a>::<wbr><a href='index.html'>lazy</a></p><script>window.sidebarCurrent = {name: 'Multipart', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>multipart</a>::<wbr><a href='../index.html'>client</a>::<wbr><a href='index.html'>lazy</a>::<wbr><a class='struct' href=''>Multipart</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-125' class='srclink' href='../../../src/multipart/src/client/lazy.rs.html#108-110' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Multipart&lt;'n, 'd&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>A multipart request which writes all fields at once upon being provided an output stream.</p>
+
+<p>Sacrifices static dispatch for support for dynamic construction. Reusable.</p>
+
+<h4 id='lifetimes' class='section-header'><a href='#lifetimes'>Lifetimes</a></h4>
+<ul>
+<li><code>&#39;n</code>: Lifetime for field <strong>n</strong>ames; will only escape this struct in <code>LazyIoError&lt;&#39;n&gt;</code>.</li>
+<li><code>&#39;d</code>: Lifetime for <strong>d</strong>ata: will only escape this struct in <code>PreparedFields&lt;&#39;d&gt;</code>.</li>
+</ul>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'n, 'd&gt; <a class='struct' href='../../../multipart/client/lazy/struct.Multipart.html' title='multipart::client::lazy::Multipart'>Multipart</a>&lt;'n, 'd&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-337' class='srclink' href='../../../src/multipart/src/client/lazy.rs.html#397-430' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.client_request' class='method'><code>fn <a href='#method.client_request' class='fnname'>client_request</a>&lt;U: <a class='trait' href='https://hyperium.github.io/hyper/hyper/client/trait.IntoUrl.html' title='hyper::client::IntoUrl'>IntoUrl</a>&gt;(&amp;mut self, client: &amp;<a class='struct' href='https://hyperium.github.io/hyper/hyper/client/struct.Client.html' title='hyper::client::Client'>Client</a>, url: U) -&gt; <a class='type' href='https://hyperium.github.io/hyper/hyper/error/type.Result.html' title='hyper::error::Result'>HyperResult</a>&lt;<a class='struct' href='https://hyperium.github.io/hyper/hyper/client/response/struct.Response.html' title='hyper::client::response::Response'>Response</a>&gt;</code></h4>
+<div class='docblock'>
+<h4 id='feature-hyper' class='section-header'><a href='#feature-hyper'>Feature: <code>hyper</code></a></h4>
+<p>Complete a POST request with the given <code>hyper::client::Client</code> and URL.</p>
+
+<p>Supplies the fields in the body, optionally setting the content-length header if
+applicable (all added fields were text or files, i.e. no streams).</p>
+</div><h4 id='method.client_request_mut' class='method'><code>fn <a href='#method.client_request_mut' class='fnname'>client_request_mut</a>&lt;U: <a class='trait' href='https://hyperium.github.io/hyper/hyper/client/trait.IntoUrl.html' title='hyper::client::IntoUrl'>IntoUrl</a>, F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(<a class='struct' href='https://hyperium.github.io/hyper/hyper/client/struct.RequestBuilder.html' title='hyper::client::RequestBuilder'>RequestBuilder</a>) -&gt; <a class='struct' href='https://hyperium.github.io/hyper/hyper/client/struct.RequestBuilder.html' title='hyper::client::RequestBuilder'>RequestBuilder</a>&gt;(&amp;mut self, client: &amp;<a class='struct' href='https://hyperium.github.io/hyper/hyper/client/struct.Client.html' title='hyper::client::Client'>Client</a>, url: U, mut_fn: F) -&gt; <a class='type' href='https://hyperium.github.io/hyper/hyper/error/type.Result.html' title='hyper::error::Result'>HyperResult</a>&lt;<a class='struct' href='https://hyperium.github.io/hyper/hyper/client/response/struct.Response.html' title='hyper::client::response::Response'>Response</a>&gt;</code></h4>
+<div class='docblock'>
+<h4 id='feature-hyper-1' class='section-header'><a href='#feature-hyper-1'>Feature: <code>hyper</code></a></h4>
+<p>Complete a POST request with the given <code>hyper::client::Client</code> and URL;
+allows mutating the <code>hyper::client::RequestBuilder</code> via the passed closure.</p>
+
+<p>Note that the body, and the <code>ContentType</code> and <code>ContentLength</code> headers will be
+overwritten, either by this method or by Hyper.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;'n, 'd&gt; <a class='struct' href='../../../multipart/client/lazy/struct.Multipart.html' title='multipart::client::lazy::Multipart'>Multipart</a>&lt;'n, 'd&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-141' class='srclink' href='../../../src/multipart/src/client/lazy.rs.html#112-193' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; Self</code></h4>
+<div class='docblock'><p>Initialize a new lazy dynamic request.</p>
+</div><h4 id='method.add_text' class='method'><code>fn <a href='#method.add_text' class='fnname'>add_text</a>&lt;N, T&gt;(&amp;mut self, name: N, text: T) -&gt; &amp;mut Self <span class='where'>where N: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'n, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;, T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'d, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;</span></code></h4>
+<div class='docblock'><p>Add a text field to this request.</p>
+</div><h4 id='method.add_file' class='method'><code>fn <a href='#method.add_file' class='fnname'>add_file</a>&lt;N, P&gt;(&amp;mut self, name: N, path: P) -&gt; &amp;mut Self <span class='where'>where N: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'n, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;, P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'d, <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;</span></code></h4>
+<div class='docblock'><p>Add a file field to this request.</p>
+
+<h3 id='note' class='section-header'><a href='#note'>Note</a></h3>
+<p>Does not check if <code>path</code> exists.</p>
+</div><h4 id='method.add_stream' class='method'><code>fn <a href='#method.add_stream' class='fnname'>add_stream</a>&lt;N, R, F&gt;(&amp;mut self, name: N, stream: R, filename: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;F&gt;, mime: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://hyperium.github.io/mime.rs/mime/struct.Mime.html' title='mime::Mime'>Mime</a>&gt;) -&gt; &amp;mut Self <span class='where'>where N: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'n, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;, R: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + 'd, F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'n, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;</span></code></h4>
+<div class='docblock'><p>Add a generic stream field to this request,</p>
+</div><h4 id='method.send' class='method'><code>fn <a href='#method.send' class='fnname'>send</a>&lt;R: <a class='trait' href='../../../multipart/client/trait.HttpRequest.html' title='multipart::client::HttpRequest'>HttpRequest</a>&gt;(&amp;mut self, req: R) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;R::Stream::Response, <a class='struct' href='../../../multipart/client/lazy/struct.LazyError.html' title='multipart::client::lazy::LazyError'>LazyError</a>&lt;'n, R::Stream::Error&gt;&gt;</code></h4>
+<div class='docblock'><p>Convert <code>req</code> to <code>HttpStream</code>, write out the fields in this request, and finish the
+request, returning the response if successful, or the first error encountered.</p>
+</div><h4 id='method.prepare' class='method'><code>fn <a href='#method.prepare' class='fnname'>prepare</a>(&amp;mut self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../multipart/client/lazy/struct.PreparedFields.html' title='multipart::client::lazy::PreparedFields'>PreparedFields</a>&lt;'d&gt;, <a class='type' href='../../../multipart/client/lazy/type.LazyIoError.html' title='multipart::client::lazy::LazyIoError'>LazyIoError</a>&lt;'n&gt;&gt;</code></h4>
+<div class='docblock'><p>Export the multipart data contained in this lazy request as an adaptor which implements <code>Read</code>.</p>
+
+<p>A certain amount of field data will be buffered. See
+<a href="#method.prepare_threshold"><code>prepare_threshold()</code></a> for more information on this behavior.</p>
+</div><h4 id='method.prepare_threshold' class='method'><code>fn <a href='#method.prepare_threshold' class='fnname'>prepare_threshold</a>(&amp;mut self, buffer_threshold: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../multipart/client/lazy/struct.PreparedFields.html' title='multipart::client::lazy::PreparedFields'>PreparedFields</a>&lt;'d&gt;, <a class='type' href='../../../multipart/client/lazy/type.LazyIoError.html' title='multipart::client::lazy::LazyIoError'>LazyIoError</a>&lt;'n&gt;&gt;</code></h4>
+<div class='docblock'><p>Export the multipart data contained in this lazy request to an adaptor which implements <code>Read</code>.</p>
+
+<h4 id='buffering' class='section-header'><a href='#buffering'>Buffering</a></h4>
+<p>For efficiency, text and file fields smaller than <code>buffer_threshold</code> are copied to an in-memory buffer. If <code>None</code>,
+all fields are copied to memory.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><span class='in-band'><code>impl&lt;'n, 'd&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../../multipart/client/lazy/struct.Multipart.html' title='multipart::client::lazy::Multipart'>Multipart</a>&lt;'n, 'd&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-129' class='srclink' href='../../../src/multipart/src/client/lazy.rs.html#107' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../../multipart/client/lazy/struct.Multipart.html' title='multipart::client::lazy::Multipart'>Multipart</a>&lt;'n, 'd&gt;</code></h4>
+<div class='docblock'><p>Returns the &quot;default value&quot; for a type. <a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;'n, 'd&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../multipart/client/lazy/struct.Multipart.html' title='multipart::client::lazy::Multipart'>Multipart</a>&lt;'n, 'd&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-133' class='srclink' href='../../../src/multipart/src/client/lazy.rs.html#107' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "multipart";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script defer src="../../../search-index.js"></script>
+</body>
+</html>

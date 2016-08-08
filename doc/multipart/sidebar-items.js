@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["chain_result!","Chain a series of results together, with or without previous results."]],"mod":[["client","The client-side abstraction for multipart requests. Enabled with the `client` feature (on by default)."],["server","The server-side abstraction for multipart requests. Enabled with the `server` feature (on by default)."]]});

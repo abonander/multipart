@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["TinyHttpRequest","Represents an HTTP request made by a client."]]});
