@@ -245,7 +245,7 @@ impl<B> Borrow<B> for Multipart<B> {
     }
 }
 
-/// The result of [`Multipart::save_all()`](struct.multipart.html#method.save_all).
+/// The result of [`Multipart::save_all()`](struct.Multipart.html#method.save_all).
 #[derive(Debug)]
 pub enum SaveResult {
     /// The operation was a total success. Contained are all entries of the request.
