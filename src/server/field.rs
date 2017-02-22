@@ -9,8 +9,6 @@
 
 use super::httparse::{self, EMPTY_HEADER, Status};
 
-use super::Multipart;
-
 use self::ReadEntryResult::*;
 
 use super::buf_redux::copy_buf;
@@ -102,30 +100,26 @@ where R: BufRead, F: FnOnce(&[StrHeader]) -> Ret {
 
 /// The headers that (may) appear before a `multipart/form-data` field.
 pub struct FieldHeaders {
-    /// The `Content-Disposition` header, required.
-    cont_disp: ContentDisp,
+    /// The `Content-Disposition` header, required for full .
+    cont_disp: Option<ContentDisp>,
     /// The `Content-Type` header, optional.
     cont_type: Option<Mime>,
 }
 
 impl FieldHeaders {
     /// Parse the field headers from the passed `BufRead`, consuming the relevant bytes.
-    fn read_from<R: BufRead>(r: &mut R) -> io::Result<Option<Self>> {
+    fn read_from<R: BufRead>(r: &mut R) -> io::Result<Self> {
         with_headers(r, Self::parse)
     }
 
-    fn parse(headers: &[StrHeader]) -> Option<FieldHeaders> {
-        let cont_disp = try_opt!(
-                ContentDisp::parse(headers),
-                debug!("Failed to read Content-Disposition")
-            );
-
+    fn parse(headers: &[StrHeader]) -> FieldHeaders {
+        let cont_disp = ContentDisp::parse(headers);
         let cont_type = parse_cont_type(headers);
 
-        Some(FieldHeaders {
+        FieldHeaders {
             cont_disp: cont_disp,
             cont_type: cont_type,
-        })
+        }
     }
 }
 
@@ -323,10 +317,6 @@ impl<M> Into<String> for MultipartText<M> {
 }
 
 impl<M> MultipartText<M> {
-    fn inner_mut(&mut self) -> &mut M {
-        self.inner.as_mut().expect("MultipartText::inner taken!")
-    }
-
     fn take_inner(&mut self) -> M {
         self.inner.take().expect("MultipartText::inner taken!")
     }
@@ -346,8 +336,36 @@ impl<M> MultipartText<M> {
 /// to save it to disk.
 #[derive(Debug)]
 pub struct MultipartFile<M> {
-    filename: Option<String>,
-    content_type: Mime,
+    /// The filename of this entry, if supplied.
+    ///
+    /// ### Warning: Client Provided / Untrustworthy
+    /// You should treat this value as **untrustworthy** because it is an arbitrary string
+    /// provided by the client.
+    ///
+    /// It is a serious security risk to create files or directories with paths based on user input.
+    /// A malicious user could craft a path which can be used to overwrite important files, such as
+    /// web templates, static assets, Javascript files, database files, configuration files, etc.,
+    /// if they are writable by the server process.
+    ///
+    /// This can be mitigated somewhat by setting filesystem permissions as
+    /// conservatively as possible and running the server under its own user with restricted
+    /// permissions, but you should still not use user input directly as filesystem paths.
+    /// If it is truly necessary, you should sanitize filenames such that they cannot be
+    /// misinterpreted by the OS. Such functionality is outside the scope of this crate.
+    pub filename: Option<String>,
+
+    /// The MIME type (`Content-Type` value) of this file, if supplied by the client,
+    /// or `"applicaton/octet-stream"` otherwise.
+    ///
+    /// ### Note: Client Provided
+    /// Consider this value to be potentially untrustworthy, as it is provided by the client.
+    /// It may be inaccurate or entirely wrong, depending on how the client determined it.
+    ///
+    /// Some variants wrap arbitrary strings which could be abused by a malicious user if your
+    /// application performs any non-idempotent operations based on their value, such as
+    /// starting another program or querying/updating a database (web-search "SQL injection").
+    pub content_type: Mime,
+
     /// The `Multipart` this field was read from.
     inner: Option<M>,
 }
@@ -355,16 +373,36 @@ pub struct MultipartFile<M> {
 impl<M> MultipartFile<M> {
     /// Get the filename of this entry, if supplied.
     ///
-    /// ##Warning
-    /// You should treat this value as untrustworthy because it is an arbitrary string provided by
-    /// the client. You should *not* blindly append it to a directory path and save the file there,
-    /// as such behavior could easily be exploited by a malicious client.
+    /// ### Warning: Client Provided / Untrustworthy
+    /// You should treat this value as **untrustworthy** because it is an arbitrary string
+    /// provided by the client.
+    ///
+    /// It is a serious security risk to create files or directories with paths based on user input.
+    /// A malicious user could craft a path which can be used to overwrite important files, such as
+    /// web templates, static assets, Javascript files, database files, configuration files, etc.,
+    /// if they are writable by the server process.
+    ///
+    /// This can be mitigated somewhat by setting filesystem permissions as
+    /// conservatively as possible and running the server under its own user with restricted
+    /// permissions, but you should still not use user input directly as filesystem paths.
+    /// If it is truly necessary, you should sanitize filenames such that they cannot be
+    /// misinterpreted by the OS. Such functionality is outside the scope of this crate.
+    #[deprecated = "`filename` field is now public"]
     pub fn filename(&self) -> Option<&str> {
         self.filename.as_ref().map(String::as_ref)
     }
 
     /// Get the MIME type (`Content-Type` value) of this file, if supplied by the client,
     /// or `"applicaton/octet-stream"` otherwise.
+    ///
+    /// ### Note: Client Provided
+    /// Consider this value to be potentially untrustworthy, as it is provided by the client.
+    /// It may be inaccurate or entirely wrong, depending on how the client determined it.
+    ///
+    /// Some variants wrap arbitrary strings which could be abused by a malicious user if your
+    /// application performs any non-idempotent operations based on their value, such as
+    /// starting another program or querying/updating a database (web-search "SQL injection").
+    #[deprecated = "`content_type` field is now public"]
     pub fn content_type(&self) -> &Mime {
         &self.content_type
     }
@@ -384,8 +422,8 @@ impl<M> MultipartFile<M> {
 
 impl<M> MultipartFile<M> where M: ReadEntry {
     /// Get a builder type which can save the file with or without a size limit.
-    pub fn save(&mut self) -> SaveBuilder<M> {
-        SaveBuilder::from_file(self)
+    pub fn save(&mut self) -> SaveBuilder<Self> {
+        SaveBuilder::new(&mut self.inner, self.filename.as_ref())
     }
 
     /// Save this file to the given output stream.
@@ -478,19 +516,21 @@ impl<M: ReadEntry> BufRead for MultipartFile<M> {
 
 /// A builder for saving a `MultipartFile` to the local filesystem.
 pub struct SaveBuilder<'m, M: 'm> {
-    file: &'m mut MultipartFile<M>,
+    inner: &'r mut M,
     open_opts: OpenOptions,
+    filename: Option<String>,
     limit: Option<u64>,
 }
 
-impl<'m, M: 'm> SaveBuilder<'m, M> where MultipartFile<M>: BufRead {
-    fn from_file(file: &'m mut MultipartFile<M>) -> Self {
+impl<'m, M: 'm> SaveBuilder<'m, M> where M: ReadEntry {
+    fn new(inner: &'r mut M, filename: Option<&'m str>) -> Self {
         let mut open_opts = OpenOptions::new();
         open_opts.write(true).create_new(true);
 
         SaveBuilder {
-            file: file,
+            inner: inner,
             open_opts: open_opts,
+            filename: filename,
             limit: None,
         }
     }
@@ -580,12 +620,12 @@ impl<'m, M: 'm> SaveBuilder<'m, M> where MultipartFile<M>: BufRead {
 
         try!(create_full_path(&path));
 
-        let mut file = try!(self.open_opts.open(&path));
+        let file = try!(self.open_opts.open(&path));
         let (written, truncated) = try!(self.write_to(file));
 
         Ok(SavedFile {
             path: path,
-            filename: self.file.filename.clone(),
+            filename: self.filename.clone(),
             size: written,
             truncated: truncated,
             _priv: (),
@@ -605,16 +645,16 @@ impl<'m, M: 'm> SaveBuilder<'m, M> where MultipartFile<M>: BufRead {
     /// Write out the file field to `dest`, truncating if a limit was set.
     ///
     /// Returns the number of bytes copied, and whether or not the limit was reached
-    /// (tested by `MultipartFile::fill_buf().is_empty()` so no bytes are consumed).
+    /// (tested by `BufRead::fill_buf().is_empty()` so no bytes are consumed).
     ///
     /// Retries on interrupts.
     pub fn write_to<W: Write>(&mut self, mut dest: W) -> io::Result<(u64, bool)> {
         if let Some(limit) = self.limit {
-            let copied = try!(copy_buf(&mut self.file.by_ref().take(limit), &mut dest));
+            let copied = try!(copy_buf(&mut self.inner.source().take(limit), &mut dest));
             // If there's more data to be read, the field was truncated
             Ok((copied, !try!(self.file.fill_buf()).is_empty()))
         } else {
-            copy_buf(&mut self.file, &mut dest).map(|copied| (copied, false))
+            copy_buf(&mut self.source(), &mut dest).map(|copied| (copied, false))
         }
     }
 }
@@ -627,10 +667,9 @@ pub struct SavedFile {
 
     /// The original filename of this file, if one was provided in the request.
     ///
-    /// ##Warning: Provided by Client! Do **not** trust user input!
-    /// You should treat this value as untrustworthy because it is an arbitrary string provided by
-    /// the client. You should *not* blindly append it to a directory path and save the file there,
-    /// as such behavior could easily be exploited by a malicious client.
+    /// ### Warning: Client Provided / Untrustworthy
+    /// You should treat this value as **untrustworthy** because it is an arbitrary string
+    /// provided by the client.
     ///
     /// It is a serious security risk to create files or directories with paths based on user input.
     /// A malicious user could craft a path which can be used to overwrite important files, such as
@@ -641,7 +680,7 @@ pub struct SavedFile {
     /// conservatively as possible and running the server under its own user with restricted
     /// permissions, but you should still not use user input directly as filesystem paths.
     /// If it is truly necessary, you should sanitize filenames such that they cannot be
-    /// misinterpreted by the OS.
+    /// misinterpreted by the OS. That functionality is outside the scope of this crate.
     pub filename: Option<String>,
 
     /// The number of bytes written to the disk. May be truncated, check the `truncated` flag
@@ -697,10 +736,52 @@ fn rand_filename() -> String {
     ::random_alphanumeric(RANDOM_FILENAME_LEN)
 }
 
-pub struct NestedEntry<M: ReadEntry> {
+/// A nested multipart entry, always assumed to be a file.
+pub struct NestedFile<M> {
+    /// The MIME type of the file field.
     pub content_type: Mime,
+    /// The
     pub filename: Option<String>,
-    inner: M
+    inner: Option<M>
+}
+
+impl<M: ReadEntry> NestedFile<M> {
+    /// Read the next entry in the request.
+    pub fn next_entry(self) -> ReadEntryResult<M> {
+        self.data.into_inner().read_entry()
+    }
+
+    /// Update `self` as the next entry.
+    ///
+    /// Returns `Ok(Some(self))` if another entry was read, `Ok(None)` if the end of the body was
+    /// reached, and `Err(e)` for any errors that occur.
+    pub fn next_entry_inplace(&mut self) -> io::Result<Option<&mut Self>> where for<'a> &'a mut M: ReadEntry {
+        let multipart = self.data.take_inner();
+
+        match multipart.read_entry() {
+            Entry(entry) => {
+                *self = entry;
+                Ok(Some(self))
+            },
+            End(multipart) => {
+                self.data.give_inner(multipart);
+                Ok(None)
+            },
+            Error(multipart, err) => {
+                self.data.give_inner(multipart);
+                Err(err)
+            }
+        }
+    }
+
+    /// Return the inner `Multipart`.
+    pub fn into_inner(self) -> M {
+        self.inner.expect("MultipartFile::inner taken!")
+    }
+
+    fn take_inner(&mut self) -> M {
+        self.inner.take().expect("MultipartFile::inner taken!")
+    }
 }
 
 #[derive(Debug)]
@@ -710,9 +791,7 @@ pub struct NestedMultipart<M: ReadEntry> {
 }
 
 impl<M: ReadEntry> NestedMultipart<M> {
-    pub fn read_entry(&mut self) -> ReadEntryResult<&mut M, NestedEntry<&mut M>>
-        where for<'a> &'a mut M: ReadEntry {
-
+    pub fn read_entry(&mut self) -> ReadEntryResult<&mut M, NestedFile<&mut M>> {
         let inner = self.inner_mut();
 
         let headers = match inner.read_headers() {
@@ -728,7 +807,7 @@ impl<M: ReadEntry> NestedMultipart<M> {
         };
 
         Entry (
-            NestedEntry {
+            NestedFile {
                 filename: headers.cont_disp.filename,
                 content_type: cont_type,
                 inner: inner,
@@ -764,36 +843,9 @@ impl<M: ReadEntry> Drop for NestedMultipart<M> {
     }
 }
 
-/// Common trait for `Multipart` and `&mut Multipart`
-pub trait ReadEntry: PrivReadEntry {}
-
-impl<T> ReadEntry for T where T: PrivReadEntry {}
-
-/// Public trait but not re-exported.
-pub trait PrivReadEntry: Sized {
-    type Source: BufRead;
-
-    fn source(&mut self) -> &mut Self::Source;
-
-    /// Consume the next boundary.
-    /// Returns `true` if the last boundary was read, `false` otherwise.
-    fn consume_boundary(&mut self) -> io::Result<bool>;
-
-    fn swap_boundary<B: Into<Vec<u8>>>(&mut self, boundary: B) -> Vec<u8>;
-
-    fn read_headers(&mut self) -> io::Result<Option<FieldHeaders>> {
-        FieldHeaders::read_from(&mut self.source())
-    }
-
-    fn read_to_string(&mut self) -> io::Result<String> {
-        let mut buf = String::new();
-
-        match self.source().read_to_string(&mut buf) {
-            Ok(_) => Ok(buf),
-            Err(err) => Err(err),
-        }
-    }
-
+/// Common trait for `Multipart` and `&mut Multipart`.
+pub trait ReadEntry: PrivReadEntry + Sized {
+    /// Read the next entry in the stream.
     fn read_entry(mut self) -> ReadEntryResult<Self> {
         if try_read_entry!(self; self.consume_boundary()) {
             return End(self);
@@ -850,6 +902,34 @@ pub trait PrivReadEntry: Sized {
                 data: data,
             }
         )
+    }
+}
+
+impl<T> ReadEntry for T where T: PrivReadEntry {}
+
+/// Public trait but not re-exported.
+pub trait PrivReadEntry {
+    type Source: BufRead;
+
+    fn source(&mut self) -> &mut Self::Source;
+
+    /// Consume the next boundary.
+    /// Returns `true` if the last boundary was read, `false` otherwise.
+    fn consume_boundary(&mut self) -> io::Result<bool>;
+
+    fn swap_boundary<B: Into<Vec<u8>>>(&mut self, boundary: B) -> Vec<u8>;
+
+    fn read_headers(&mut self) -> io::Result<Option<FieldHeaders>> {
+        FieldHeaders::read_from(&mut self.source())
+    }
+
+    fn read_to_string(&mut self) -> io::Result<String> {
+        let mut buf = String::new();
+
+        match self.source().read_to_string(&mut buf) {
+            Ok(_) => Ok(buf),
+            Err(err) => Err(err),
+        }
     }
 }
 

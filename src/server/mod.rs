@@ -29,8 +29,9 @@ use self::boundary::BoundaryReader;
 
 use self::field::PrivReadEntry;
 
-pub use self::field::{MultipartField, MultipartFile, MultipartData, ReadEntry, ReadEntryResult,
-                      SaveBuilder, SavedFile};
+pub use self::field::{
+    MultipartField, MultipartFile, MultipartData, NestedMultipart, NestedFile,
+    ReadEntry, ReadEntryResult, SaveBuilder, SavedFile};
 
 macro_rules! try_opt (
     ($expr:expr) => (
