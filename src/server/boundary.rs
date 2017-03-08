@@ -49,7 +49,11 @@ impl<R> BoundaryReader<R> where R: Read {
 
         let buf = try!(fill_buf_min(&mut self.source, min_len));
 
-        self.at_end = buf.len() == 0;
+        if buf.len() == 0 {
+            debug!("fill_buf_min returned zero-sized buf");
+            self.at_end = true;
+            return Ok(buf);
+        }
 
         if log_enabled!(LogLevel::Trace) {
             trace!("Buf: {:?}", String::from_utf8_lossy(buf));
@@ -130,8 +134,7 @@ impl<R> BoundaryReader<R> where R: Read {
 
         if log_enabled!(LogLevel::Trace) {
             trace!("Consumed up to self.search_idx, remaining buf: {:?}",
-                   String::from_utf8_lossy(self.source.get_buf())
-            );
+                   String::from_utf8_lossy(self.source.get_buf()));
         }
 
         let consume_amt = {
@@ -164,13 +167,6 @@ impl<R> BoundaryReader<R> where R: Read {
         }
 
         Ok(self.at_end)
-    }
-
-    // Keeping this around to support nested boundaries later.
-    #[allow(unused)]
-    #[doc(hidden)]
-    pub fn set_boundary<B: Into<Vec<u8>>>(&mut self, boundary: B) {
-        self.boundary = boundary.into();
     }
 }
 
@@ -209,8 +205,13 @@ impl<R> BufRead for BoundaryReader<R> where R: Read {
 }
 
 fn fill_buf_min<R: Read>(buf: &mut BufReader<R>, min: usize) -> io::Result<&[u8]> {
-    if buf.available() < min {
-        try!(buf.read_into_buf());
+    const MAX_ATTEMPTS: usize = 3;
+
+    let mut attempts = 0;
+
+    while buf.available() < min && attempts < MAX_ATTEMPTS {
+        if try!(buf.read_into_buf()) == 0 { break; };
+        attempts += 1;
     }
 
     Ok(buf.get_buf())
