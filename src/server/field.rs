@@ -7,13 +7,13 @@
 
 //! `multipart` field header parsing.
 
-use super::httparse::{self, EMPTY_HEADER, Status};
+use super::httparse::{self, EMPTY_HEADER, Header, Status};
 
 use super::Multipart;
 
 use super::boundary::BoundaryReader;
 
-use mime::{Attr, Mime, Value};
+use mime::Mime;
 
 use std::io::{self, Read, BufRead, Write};
 use std::fs::{self, File};
@@ -34,83 +34,94 @@ macro_rules! try_io(
     )
 );
 
-macro_rules! assert_log_ret_none (
-    ($expr, $else_:expr) => (
-        if !$expr {
-            $else_;
-            return None;
-        }
-    )
-);
-
 const EMPTY_STR_HEADER: StrHeader<'static> = StrHeader {
     name: "",
     val: "",
 };
 
+/// Not exposed
 #[derive(Copy, Clone, Debug)]
-struct StrHeader<'a> {
+pub struct StrHeader<'a> {
     name: &'a str,
     val: &'a str,
+}
+
+const MAX_ATTEMPTS: usize = 5;
+
+fn with_headers<R, F, Ret>(r: &mut R, closure: F) -> io::Result<Ret>
+where R: BufRead, F: FnOnce(&[StrHeader]) -> Ret {
+    const HEADER_LEN: usize = 4;
+
+    // These are only written once so they don't need to be `mut` or initialized.
+    let consume;
+    let ret;
+
+    let mut attempts = 0;
+
+    loop {
+        let mut raw_headers = [EMPTY_HEADER; HEADER_LEN];
+
+        let buf = try!(r.fill_buf());
+
+        if attempts == MAX_ATTEMPTS {
+            error!("Could not read field headers.");
+            // RFC: return an actual error instead?
+            return Ok(closure(&[]));
+        }
+
+        match httparse::parse_headers(buf, &mut raw_headers) {
+            Ok(Status::Complete((consume_, raw_headers))) =>  {
+                consume = consume_;
+                let mut headers = [EMPTY_STR_HEADER; HEADER_LEN];
+                let headers = try!(copy_headers(raw_headers, &mut headers));
+                debug!("Parsed headers: {:?}", headers);
+                ret = closure(headers);
+                break;
+            },
+            Ok(Status::Partial) => { attempts += 1; continue },
+            Err(err) => {
+                error!("Error returned from parse_headers(): {}, Buf: {:?}",
+                       err, String::from_utf8_lossy(buf));
+                return Err(io::Error::new(io::ErrorKind::InvalidData, err));
+            },
+        }
+    }
+
+    r.consume(consume);
+
+    Ok(ret)
+}
+
+fn copy_headers<'h, 'b: 'h>(raw: &[Header<'b>], headers: &'h mut [StrHeader<'b>]) -> io::Result<&'h [StrHeader<'b>]> {
+    for (raw, header) in raw.iter().zip(&mut *headers) {
+        header.name = raw.name;
+        header.val = try!(io_str_utf8(raw.value));
+    }
+
+    Ok(&mut headers[..raw.len()])
 }
 
 /// The headers that (may) appear before a `multipart/form-data` field.
 pub struct FieldHeaders {
     /// The `Content-Disposition` header, required.
-    pub cont_disp: ContentDisp,
+    cont_disp: ContentDisp,
     /// The `Content-Type` header, optional.
-    pub cont_type: Option<ContentType>,
+    cont_type: Option<Mime>,
 }
 
 impl FieldHeaders {
     /// Parse the field headers from the passed `BufRead`, consuming the relevant bytes.
-    pub fn parse<R: BufRead>(r: &mut R) -> io::Result<Option<Self>> {
-        const HEADER_LEN: usize = 4;
-
-        // These are only written once so they don't need to be `mut` or initialized.
-        let consume;
-        let header_len;
-
-        let mut headers = [EMPTY_STR_HEADER; HEADER_LEN];
-
-        {
-            let mut raw_headers = [EMPTY_HEADER; HEADER_LEN];
-
-            loop {
-                let buf = try!(r.fill_buf());
-
-                match try_io!(httparse::parse_headers(buf, &mut raw_headers)) {
-                    Status::Complete((consume_, raw_headers)) =>  {
-                        consume = consume_;
-                        header_len = raw_headers.len();
-                        break;
-                    },
-                    Status::Partial => (),
-                }
-            }
-
-            for (raw, header) in raw_headers.iter().take(header_len).zip(&mut headers) {
-                header.name = raw.name;
-                header.val = try!(io_str_utf8(raw.value));
-            }
-        }
-
-        let headers = &headers[..header_len];
-
-        debug!("Parsed field headers: {:?}", headers);
-
-        r.consume(consume);
-
-        Ok(Self::read_from(headers))
+    pub fn read_from<R: BufRead>(r: &mut R) -> io::Result<Option<Self>> {
+        with_headers(r, Self::parse)
     }
 
-    fn read_from(headers: &[StrHeader]) -> Option<FieldHeaders> {
+    fn parse(headers: &[StrHeader]) -> Option<FieldHeaders> {
         let cont_disp = try_opt!(
-                ContentDisp::read_from(headers),
+                ContentDisp::parse(headers),
                 debug!("Failed to read Content-Disposition")
             );
 
-        let cont_type = ContentType::read_from(headers);
+        let cont_type = parse_cont_type(headers);
 
         Some(FieldHeaders {
             cont_disp: cont_disp,
@@ -122,13 +133,13 @@ impl FieldHeaders {
 /// The `Content-Disposition` header.
 pub struct ContentDisp {
     /// The name of the `multipart/form-data` field.
-    pub field_name: String,
+    field_name: String,
     /// The optional filename for this field.
-    pub filename: Option<String>,
+    filename: Option<String>,
 }
 
 impl ContentDisp {
-    fn read_from(headers: &[StrHeader]) -> Option<ContentDisp> {
+    fn parse(headers: &[StrHeader]) -> Option<ContentDisp> {
         if headers.is_empty() {
             return None;
         }
@@ -173,34 +184,18 @@ impl ContentDisp {
     }
 }
 
-/// The `Content-Type` header.
-pub struct ContentType {
-    /// The MIME type of the `multipart` field.
-    ///
-    /// May contain a sub-boundary parameter.
-    pub val: Mime,
-}
+fn parse_cont_type(headers: &[StrHeader]) -> Option<Mime> {
+    const CONTENT_TYPE: &'static str = "Content-Type";
 
-impl ContentType {
-    fn read_from(headers: &[StrHeader]) -> Option<ContentType> {
-        const CONTENT_TYPE: &'static str = "Content-Type";
+    let header = try_opt!(
+        find_header(headers, CONTENT_TYPE),
+        debug!("Content-Type header not found for field.")
+    );
 
-        let header = try_opt!(
-            find_header(headers, CONTENT_TYPE),
-            debug!("Content-Type header not found for field.")
-        );
-
-        // Boundary parameter will be parsed into the `Mime`
-        debug!("Found Content-Type: {:?}", header.val);
-        let content_type = read_content_type(header.val.trim());
-        Some(ContentType { val: content_type })
-    }
-
-    /// Get the optional boundary parameter for this `Content-Type`.
-    #[allow(dead_code)]
-    pub fn boundary(&self) -> Option<&str> {
-        self.val.get_param(Attr::Boundary).map(Value::as_str)
-    }
+    // Boundary parameter will be parsed into the `Mime`
+    debug!("Found Content-Type: {:?}", header.val);
+    let content_type = read_content_type(header.val.trim());
+    Some(content_type)
 }
 
 /// A field in a multipart request. May be either text or a binary stream (file).
@@ -224,7 +219,7 @@ pub fn read_field<B: Read>(multipart: &mut Multipart<B>) -> io::Result<Option<Mu
             MultipartData::File(
                 MultipartFile::from_stream(
                     field_headers.cont_disp.filename,
-                    content_type.val,
+                    content_type,
                     &mut multipart.source,
                 )
             )

@@ -110,7 +110,7 @@ impl<B: Read> Multipart<B> {
     }
 
     fn read_field_headers(&mut self) -> io::Result<Option<FieldHeaders>> {
-        FieldHeaders::parse(&mut self.source)
+        FieldHeaders::read_from(&mut self.source)
     }
 
     /// Call `f` for each entry in the multipart request.
