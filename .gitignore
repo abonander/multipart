@@ -17,3 +17,5 @@
 .idea/
 
 dump.bin
+
+fuzz/
