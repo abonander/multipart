@@ -161,7 +161,7 @@ macro_rules! do_test (
         info!("Client Test: {:?} Server Test: {:?}", stringify!($client_test),
               stringify!($server_test));
 
-        let mut test_fields = TestFields::gen();
+        let mut test_fields = ::local_test::TestFields::gen();
 
         trace!("Fields for test: {:?}", test_fields);
 
@@ -199,7 +199,7 @@ fn lazy_client_entry_server() {
 }
 
 mod extended {
-    use super::*;
+    use super::{test_client, test_client_lazy, test_server, test_server_entry_api};
 
     use std::time::Instant;
 
