@@ -5,6 +5,7 @@ branches:
   except:
   - fuzzing
 rust:
+  - 1.13
   - stable
   - beta
   - nightly
