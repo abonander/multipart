@@ -52,7 +52,7 @@ fn process_request<'a, 'b>(request: &'a mut Request) -> io::Result<Response<&'b 
 /// Processes saved entries from multipart request.
 /// Returns an OK response or an error.
 fn process_entries<'a>(entries: Entries) -> io::Result<Response<&'a [u8]>> {
-    for (name, field) in entries.fields {
+    for (name, field) in entries.fields.into_map() {
         println!("Field {:?}: {:?}", name, field);
     }
 

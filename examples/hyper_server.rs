@@ -42,7 +42,7 @@ impl MultipartHandler for EchoMultipart {
 }
 
 fn process_entries<'a>(entries: Entries) -> io::Result<()> {
-    for (name, field) in entries.fields {
+    for (name, field) in entries.fields.into_map() {
         println!("Field {:?}: {:?}", name, field);
     }
 

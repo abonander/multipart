@@ -231,7 +231,7 @@ impl<M> SaveBuilder<M> where M: ReadEntry {
                 },
                 MultipartData::Text(mut text) => {
                     self.savable = text.take_inner();
-                    entries.fields.insert(field.name, text.text);
+                    entries.fields.push((field.name, text.text));
                 },
             }
         }
@@ -388,11 +388,49 @@ impl SavedFile {
     }
 }
 
+/// Wrapper for the fields of an `Entries`.
+#[derive(Debug, Default)]
+pub struct FieldsWrapper(Vec<(String, String)>);
+
+impl FieldsWrapper {
+
+    /// Convert to inner
+    pub fn into_inner(self) -> Vec<(String, String)> { self.0 }
+
+    /// Converts the contents into a multivalued hashmap
+    pub fn into_multivalued_map(mut self) -> HashMap<String, Vec<String>> {
+        let mut out = HashMap::new();
+        for (key, val) in self.0.drain(..) {
+            out.entry(key).or_insert_with(Vec::new).push(val);
+        }
+        out
+    }
+
+    /// Converts the contents into a single-valued hashmap
+    pub fn into_map(mut self) -> HashMap<String, String> {
+        self.0.into_iter().collect()
+    }
+}
+
+impl ::std::ops::Deref for FieldsWrapper {
+    type Target = Vec<(String, String)>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl ::std::ops::DerefMut for FieldsWrapper {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 /// A result of `Multipart::save_all()`.
 #[derive(Debug)]
 pub struct Entries {
     /// The text fields of the multipart request, mapped by field name -> value.
-    pub fields: HashMap<String, String>,
+    pub fields: FieldsWrapper,
     /// A map of file field names to their contents saved on the filesystem.
     pub files: HashMap<String, Vec<SavedFile>>,
     /// The directory the files in this request were saved under; may be temporary or permanent.
@@ -402,7 +440,7 @@ pub struct Entries {
 impl Entries {
     fn new(save_dir: SaveDir) -> Self {
         Entries {
-            fields: HashMap::new(),
+            fields: FieldsWrapper::default(),
             files: HashMap::new(),
             save_dir: save_dir,
         }
