@@ -400,7 +400,7 @@ impl FieldsWrapper {
     /// Converts the contents into a multivalued hashmap
     pub fn into_multivalued_map(mut self) -> HashMap<String, Vec<String>> {
         let mut out = HashMap::new();
-        for (key, val) in self.0.drain(..) {
+        for (key, val) in self.0.into_iter() {
             out.entry(key).or_insert_with(Vec::new).push(val);
         }
         out
