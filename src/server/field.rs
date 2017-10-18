@@ -20,6 +20,8 @@ use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::{str, fmt, error};
 
+use std::ascii::AsciiExt;
+
 const EMPTY_STR_HEADER: StrHeader<'static> = StrHeader {
     name: "",
     val: "",
@@ -32,7 +34,7 @@ pub struct StrHeader<'a> {
     val: &'a str,
 }
 
-const MAX_ATTEMPTS: usize = 5;
+const MAX_ATTEMPTS: usize = 30;
 
 fn with_headers<R, F, Ret>(r: &mut R, closure: F) -> Result<Ret, ParseHeaderError>
 where R: BufRead, F: FnOnce(&[StrHeader]) -> Ret {
@@ -516,7 +518,9 @@ fn io_str_utf8(buf: &[u8]) -> io::Result<&str> {
 }
 
 fn find_header<'a, 'b>(headers: &'a [StrHeader<'b>], name: &str) -> Option<&'a StrHeader<'b>> {
-    headers.iter().find(|header| header.name == name)
+    /// Field names are case insensitive and consist of ASCII characters
+    /// only (see https://tools.ietf.org/html/rfc822#section-3.2).
+    headers.iter().find(|header| header.name.eq_ignore_ascii_case(name))
 }
 
 /// Common trait for `Multipart` and `&mut Multipart`
@@ -738,4 +742,17 @@ impl From<httparse::Error> for ParseHeaderError {
     fn from(err: httparse::Error) -> ParseHeaderError {
         ParseHeaderError::Invalid(format!("{}", err))
     }
+}
+
+#[test]
+fn test_find_header() {
+    let headers = [
+        StrHeader { name: "Content-Type", val: "text/plain" },
+        StrHeader { name: "Content-disposition", val: "form-data" },
+        StrHeader { name: "content-transfer-encoding", val: "binary" }
+    ];
+
+    assert_eq!(find_header(&headers, "Content-Type").unwrap().val, "text/plain");
+    assert_eq!(find_header(&headers, "Content-Disposition").unwrap().val, "form-data");
+    assert_eq!(find_header(&headers, "Content-Transfer-Encoding").unwrap().val, "binary");
 }
