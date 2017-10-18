@@ -388,17 +388,16 @@ impl SavedFile {
     }
 }
 
-/// Wrapper for the fields of an `Entries`.
+/// Wrapper for the fields of an `Entries`. Stores text fields in a `Vec<(String, String)>` to
+/// enable accessing fields with duplicated names.
+
 #[derive(Debug, Default)]
 pub struct FieldsWrapper(Vec<(String, String)>);
 
 impl FieldsWrapper {
 
-    /// Convert to inner
-    pub fn into_inner(self) -> Vec<(String, String)> { self.0 }
-
     /// Converts the contents into a multivalued hashmap
-    pub fn into_multivalued_map(mut self) -> HashMap<String, Vec<String>> {
+    pub fn into_multivalued_map(self) -> HashMap<String, Vec<String>> {
         let mut out = HashMap::new();
         for (key, val) in self.0.into_iter() {
             out.entry(key).or_insert_with(Vec::new).push(val);
@@ -407,8 +406,17 @@ impl FieldsWrapper {
     }
 
     /// Converts the contents into a single-valued hashmap
-    pub fn into_map(mut self) -> HashMap<String, String> {
+    pub fn into_map(self) -> HashMap<String, String> {
         self.0.into_iter().collect()
+    }
+}
+
+impl ::std::iter::IntoIterator for FieldsWrapper {
+    type Item = (String, String);
+    type IntoIter = ::std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
     }
 }
 

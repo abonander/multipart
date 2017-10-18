@@ -47,7 +47,7 @@ fn process_request(request: &mut Request) -> IronResult<Response> {
 /// Processes saved entries from multipart request.
 /// Returns an OK response or an error.
 fn process_entries(entries: Entries) -> IronResult<Response> {
-    for (name, field) in entries.fields.into_map() {
+    for (name, field) in entries.fields {
         println!("Field {:?}: {:?}", name, field);
     }
 
