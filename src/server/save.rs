@@ -411,7 +411,7 @@ impl FieldsWrapper {
     }
 }
 
-impl ::std::iter::IntoIterator for FieldsWrapper {
+impl IntoIterator for FieldsWrapper {
     type Item = (String, String);
     type IntoIter = ::std::vec::IntoIter<Self::Item>;
 
@@ -431,6 +431,13 @@ impl ::std::ops::Deref for FieldsWrapper {
 impl ::std::ops::DerefMut for FieldsWrapper {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+// this allows use of both `from(FieldsWrapper)` and `FieldsWrapper.into()`
+impl From<FieldsWrapper> for Vec<(String, String)> {
+    fn from(fields: FieldsWrapper) -> Self {
+        fields.0
     }
 }
 
