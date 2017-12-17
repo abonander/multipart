@@ -1,6 +1,6 @@
 [package]
 name = "multipart-nickel"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Austin Bonander <austin.bonander@gmail.com>"]
 
 description = '''DEPRECATED: Nickel support is returning to `multipart` itself in 0.14.
