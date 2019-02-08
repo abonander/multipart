@@ -373,7 +373,26 @@ mod test {
     }
 
     #[test]
-    fn test_empty_body() {
+    fn test_incorrect_empty_body() {
+        ::init_log();
+
+        let ref mut buf = String::new();
+        let mut reader = BoundaryReader::from_reader(&mut &[][..], BOUNDARY);
+
+        debug!("Consume 1");
+        reader.consume_boundary().unwrap_err();
+
+        debug!("Read 1");
+        let _ = reader.read_to_string(buf).unwrap();
+        assert_eq!(buf, "");
+        buf.clear();
+
+        debug!("Consume 2");
+        reader.consume_boundary().unwrap_err();
+    }
+
+    #[test]
+    fn test_correct_empty_body() {
         ::init_log();
 
         // empty body contains closing boundary only
