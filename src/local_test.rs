@@ -146,7 +146,7 @@ impl FileEntry {
 
         (
             FileEntry {
-                content_type: field.headers.content_type.unwrap_or(mime!(Application/OctetStream)),
+                content_type: field.headers.content_type.unwrap_or(mime::APPLICATION_OCTET_STREAM),
                 filename: field.headers.filename,
                 data: PrintHex(data),
             },
@@ -435,8 +435,8 @@ fn rand_mime() -> Mime {
     [
         // TODO: fill this out, preferably with variants that may be hard to parse
         // i.e. containing hyphens, mainly
-        mime!(Application/OctetStream),
-        mime!(Text/Plain),
-        mime!(Image/Png),
+        mime::APPLICATION_OCTET_STREAM,
+        mime::TEXT_PLAIN,
+        mime::IMAGE_PNG,
     ].choose(&mut rand::thread_rng()).unwrap().clone()
 }

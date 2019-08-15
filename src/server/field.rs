@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 //! `multipart` field header parsing.
-use mime::{Mime, TopLevel};
+use mime::Mime;
 
 use std::error::Error;
 use std::io::{self, Read, BufRead};
@@ -225,7 +225,7 @@ impl<M: ReadEntry> MultipartField<M> {
     ///
     /// Detecting character encodings by any means is (currently) beyond the scope of this crate.
     pub fn is_text(&self) -> bool {
-        self.headers.content_type.as_ref().map_or(true, |ct| ct.0 == TopLevel::Text)
+        self.headers.content_type.as_ref().map_or(true, |ct| ct.type_() == mime::TEXT)
     }
 
     /// Read the next entry in the request.
@@ -365,7 +365,7 @@ pub trait ReadEntry: PrivReadEntry + Sized {
         let field_headers: FieldHeaders = try_read_entry!(self; self.read_headers());
 
         if let Some(ct) = field_headers.content_type.as_ref() {
-            if ct.0 == TopLevel::Multipart {
+            if ct.type_() == mime::MULTIPART {
                 // fields of this type are sent by (supposedly) no known clients
                 // (https://tools.ietf.org/html/rfc7578#appendix-A) so I'd be fascinated
                 // to hear about any in the wild
