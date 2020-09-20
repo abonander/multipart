@@ -133,7 +133,7 @@ impl FieldHeaders {
     }
 
     fn parse(headers: &[StrHeader]) -> Result<FieldHeaders, ParseHeaderError> {
-        let cont_disp = ContentDisp::parse_required(headers)?;
+        let cont_disp = ContentDisp::parse(headers)?;
 
         Ok(FieldHeaders {
             name: cont_disp.field_name.into(),
@@ -152,13 +152,14 @@ struct ContentDisp {
 }
 
 impl ContentDisp {
-    fn parse_required(headers: &[StrHeader]) -> Result<ContentDisp, ParseHeaderError> {
+    fn parse(headers: &[StrHeader]) -> Result<ContentDisp, ParseHeaderError> {
         let header = if let Some(header) = find_header(headers, "Content-Disposition") {
             header
         } else {
-            return Err(ParseHeaderError::MissingContentDisposition(
-                DisplayHeaders(headers).to_string(),
-            ));
+            return Ok(Self {
+                field_name: "".into(),
+                filename: None,
+            });
         };
 
         // Content-Disposition: ?
