@@ -121,6 +121,7 @@ fn random_alphanumeric(len: usize) -> String {
     rand::thread_rng()
         .sample_iter(&rand::distributions::Alphanumeric)
         .take(len)
+        .map(|ch| ch as char)
         .collect()
 }
 
