@@ -67,10 +67,9 @@ to `std::io::BufReader`.)
 
 Fast, zero-copy HTTP header parsing, used to read field headers in `multipart/form-data` request bodies.
 
-### [twoway ![](https://img.shields.io/crates/v/twoway.svg)](https://crates.io/crates/twoway)
+### [memchr ![](https://img.shields.io/crates/v/memchr.svg)](https://crates.io/crates/memchr)
 
-Fast string and byte-string search. Used to find boundaries in the request body. Uses SIMD acceleration
-when possible.
+The library provides heavily optimized routines for string search primitives.
 
 ## License
 
