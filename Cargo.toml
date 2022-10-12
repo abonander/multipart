@@ -27,10 +27,10 @@ safemem = { version = "0.3", optional = true }
 tempfile = "3"
 clippy = { version = ">=0.0, <0.1", optional = true}
 
-#Server Dependencies
+# Server Dependencies
 buf_redux = { version = "0.8", optional = true, default-features = false }
 httparse = { version = "1.2", optional = true }
-twoway = { version = "0.1", optional = true }
+memchr = { version = "2.5", optional = true }
 quick-error = { version = "1.2", optional = true }
 
 # Optional Integrations
@@ -48,7 +48,7 @@ env_logger = "0.5"
 [features]
 client = []
 default = ["client", "hyper", "iron", "mock", "nickel", "server", "tiny_http"]
-server = ["buf_redux", "httparse", "quick-error", "safemem", "twoway"]
+server = ["buf_redux", "httparse", "quick-error", "safemem", "memchr"]
 mock = []
 nightly = []
 bench = []

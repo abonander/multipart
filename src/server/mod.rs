@@ -13,7 +13,7 @@
 
 pub extern crate buf_redux;
 extern crate httparse;
-extern crate twoway;
+extern crate memchr;
 
 use std::borrow::Borrow;
 use std::io::prelude::*;
