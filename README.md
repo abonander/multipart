@@ -51,7 +51,7 @@ Provides server-side integration with `tiny_http::Request` via `multipart::serve
 ### [Rocket ![](https://img.shields.io/crates/v/rocket.svg)](https://crates.io/crates/rocket)
 
 Direct integration is not provided as the Rocket folks seem to want to handle `multipart/form-data`
-behind the scenes which would supercede any integration with `multipart`. However, an example is available
+behind the scenes which would supersede any integration with `multipart`. However, an example is available
 showing how to use `multipart` on a Rocket server: [examples/rocket.rs](examples/rocket.rs)
 
 ## ⚡ Powered By ⚡

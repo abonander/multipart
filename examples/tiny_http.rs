@@ -1,10 +1,10 @@
-extern crate tiny_http;
 extern crate multipart;
+extern crate tiny_http;
 
-use std::io::{self, Cursor, Write};
-use multipart::server::{Multipart, Entries, SaveResult};
 use multipart::mock::StdoutTee;
-use tiny_http::{Response, StatusCode, Request};
+use multipart::server::{Entries, Multipart, SaveResult};
+use std::io::{self, Cursor, Write};
+use tiny_http::{Request, Response, StatusCode};
 fn main() {
     // Starting a server on `localhost:80`
     let server = tiny_http::Server::http("localhost:80").expect("Could not bind localhost:80");
@@ -12,13 +12,16 @@ fn main() {
         // This blocks until the next request is received
         let mut request = server.recv().unwrap();
 
-        // Processes a request and returns response or an occured error
+        // Processes a request and returns response or an occurred error
         let result = process_request(&mut request);
         let resp = match result {
             Ok(resp) => resp,
             Err(e) => {
-                println!("An error has occured during request proccessing: {:?}", e);
-                build_response(500, "The received data was not correctly proccessed on the server")
+                println!("An error has occurred during request processing: {:?}", e);
+                build_response(
+                    500,
+                    "The received data was not correctly processed on the server",
+                )
             }
         };
 
@@ -29,7 +32,7 @@ fn main() {
 
 type RespBody = Cursor<Vec<u8>>;
 
-/// Processes a request and returns response or an occured error.
+/// Processes a request and returns response or an occurred error.
 fn process_request(request: &mut Request) -> io::Result<Response<RespBody>> {
     // Getting a multipart reader wrapper
     match Multipart::from_request(request) {
@@ -70,9 +73,11 @@ fn process_entries(entries: Entries) -> io::Result<Response<RespBody>> {
 fn build_response<D: Into<Vec<u8>>>(status_code: u16, data: D) -> Response<RespBody> {
     let data = data.into();
     let data_len = data.len();
-    Response::new(StatusCode(status_code),
-                  vec![],
-                  Cursor::new(data),
-                  Some(data_len),
-                  None)
+    Response::new(
+        StatusCode(status_code),
+        vec![],
+        Cursor::new(data),
+        Some(data_len),
+        None,
+    )
 }
